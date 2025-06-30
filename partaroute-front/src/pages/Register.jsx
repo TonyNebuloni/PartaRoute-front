@@ -1,54 +1,55 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Stack,
+} from "@mui/material";
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    nom: "",
-    email: "",
-    mot_de_passe: "",
-    confirmation: "",
-  });
+  const [formData, setFormData] = useState({ nom: "", email: "", mot_de_passe: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (formData.mot_de_passe !== formData.confirmation) {
-      setError("Les mots de passe ne correspondent pas.");
-      return;
-    }
-
+    setError("");
     try {
       const res = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Erreur lors de l'inscription.");
+      }
+      const loginRes = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nom: formData.nom,
           email: formData.email,
           mot_de_passe: formData.mot_de_passe,
         }),
       });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Erreur lors de l'inscription.");
+      const loginData = await loginRes.json();
+      if (!loginRes.ok || !loginData.success) {
+        throw new Error("Inscription réussie, mais erreur de connexion automatique.");
       }
-
-      // Enregistrement du token (si login auto)
-      if (data.data && data.data.accessToken) {
-        localStorage.setItem("accessToken", data.data.accessToken);
-      }
-
-      navigate("/home"); // Redirection après inscription
+      const token = loginData.data.accessToken;
+      const decoded = jwtDecode(token);
+      localStorage.setItem("accessToken", token);
+      localStorage.setItem("userId", decoded.id_utilisateur);
+      localStorage.setItem("userRole", decoded.role);
+      navigate("/");
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -56,55 +57,82 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center px-6 py-10 bg-white">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-blue-900">Partaroute</h1>
-        <p className="text-sm text-gray-500 mt-2">Crée ton compte</p>
-      </div>
-
-      {error && <p className="text-red-600 text-sm mb-4 text-center">{error}</p>}
-
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="nom"
-          placeholder="Ton nom"
-          value={formData.nom}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border rounded-lg"
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="email@example.com"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border rounded-lg"
-        />
-        <input
-          type="password"
-          name="mot_de_passe"
-          placeholder="Mot de passe"
-          value={formData.mot_de_passe}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border rounded-lg"
-        />
-        <input
-          type="password"
-          name="confirmation"
-          placeholder="Confirmation"
-          value={formData.confirmation}
-          onChange={handleChange}
-          className="w-full px-4 py-3 border rounded-lg"
-        />
-
-        <button
-          type="submit"
-          className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+    <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="grey.100" px={1}>
+      <Paper elevation={3} sx={{ width: '100%', maxWidth: 400, borderTopLeftRadius: 24, borderTopRightRadius: 24, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography
+          variant="h3"
+          align="center"
+          gutterBottom
+          sx={{ fontFamily: 'Pacifico, cursive', fontSize: '2rem', mb: 3 }}
         >
-          S'inscrire
-        </button>
-      </form>
-    </div>
+          Créer un compte
+        </Typography>
+        {error && (
+          <Typography color="error" align="center" variant="body2" sx={{ mb: 2 }}>
+            {error}
+          </Typography>
+        )}
+        <Box component="form" onSubmit={handleSubmit} width="100%" noValidate>
+          <Stack spacing={2}>
+            <TextField
+              label="Pseudo"
+              name="nom"
+              placeholder="Joe Doe"
+              value={formData.nom}
+              onChange={handleChange}
+              fullWidth
+              required
+              InputProps={{ sx: { borderBottomLeftRadius: 16, borderRadius: 0 } }}
+            />
+            <TextField
+              label="Courriel"
+              name="email"
+              type="email"
+              placeholder="Joe.Doe@partaroute.com"
+              value={formData.email}
+              onChange={handleChange}
+              fullWidth
+              required
+              InputProps={{ sx: { borderBottomLeftRadius: 16, borderRadius: 0 } }}
+            />
+            <TextField
+              label="Mot de passe"
+              name="mot_de_passe"
+              type="password"
+              placeholder="Mot de passe"
+              value={formData.mot_de_passe}
+              onChange={handleChange}
+              fullWidth
+              required
+              InputProps={{ sx: { borderBottomLeftRadius: 16, borderRadius: 0 } }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                mt: 1,
+                bgcolor: 'black',
+                color: 'white',
+                borderRadius: 999,
+                fontWeight: 'bold',
+                py: 1.5,
+                fontSize: '1rem',
+                letterSpacing: 1,
+                boxShadow: 2,
+                '&:active': { transform: 'scale(0.97)' },
+                '&:hover': { bgcolor: '#222' },
+              }}
+            >
+              REJOINDRE PARTAROUTE
+            </Button>
+          </Stack>
+        </Box>
+        <Typography variant="body2" align="center" sx={{ mt: 3, color: 'grey.800' }}>
+          Déjà un compte ?{' '}
+          <Link to="/login" style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'none' }}>Se connecter</Link>
+        </Typography>
+      </Paper>
+    </Box>
   );
 }
