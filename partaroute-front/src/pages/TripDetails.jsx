@@ -1,0 +1,95 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Box, Typography, Paper, Button, CircularProgress, Alert, Stack, Snackbar, Slide } from "@mui/material";
+import axios from "axios";
+
+export default function TripDetails() {
+  const { id } = useParams();
+  const [trip, setTrip] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reservationStatus, setReservationStatus] = useState(null);
+  const [resLoading, setResLoading] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setLoading(true);
+    axios.get(`http://localhost:3000/api/trips`)
+      .then(res => {
+        // Correction : filtrer sur id_trajet
+        const found = (res.data.data || res.data).find(t => String(t.id_trajet) === String(id));
+        if (!found) throw new Error("Trajet introuvable");
+        setTrip(found);
+        setError("");
+      })
+      .catch(() => setError("Impossible de charger le trajet."))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const handleReservation = async () => {
+    setResLoading(true);
+    setReservationStatus(null);
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setNotifOpen(true);
+      setResLoading(false);
+      setTimeout(() => {
+        setNotifOpen(false);
+        localStorage.setItem('redirectAfterLogin', window.location.pathname);
+        navigate('/login');
+      }, 2000);
+      return;
+    }
+    try {
+      await axios.post(
+        "http://localhost:3000/api/reservations",
+        { trajet_id: trip.id || trip._id || trip.id_trajet },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setReservationStatus({ type: "success", msg: "Réservation effectuée avec succès !" });
+    } catch (err) {
+      setReservationStatus({ type: "error", msg: err.response?.data?.message || "Erreur lors de la réservation." });
+    } finally {
+      setResLoading(false);
+    }
+  };
+
+  if (loading) return <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh"><CircularProgress /></Box>;
+  if (error) return <Alert severity="error">{error}</Alert>;
+
+  return (
+    <Box minHeight="100vh" bgcolor="grey.100" display="flex" justifyContent="center" alignItems="center" px={1}>
+      <Snackbar
+        open={notifOpen}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        TransitionComponent={Slide}
+        message={<span style={{ color: 'black', fontWeight: 600 }}>Connecte-toi pour réserver !</span>}
+        ContentProps={{ sx: { bgcolor: '#7ed957', color: 'black', fontWeight: 600 } }}
+      />
+      <Paper sx={{ maxWidth: 500, width: '100%', p: 4, borderRadius: 4 }}>
+        <Typography variant="h4" align="center" sx={{ fontFamily: 'Pacifico, cursive', mb: 2 }}>
+          {trip.ville_depart} → {trip.ville_arrivee}
+        </Typography>
+        <Stack spacing={1} mb={2}>
+          <Typography><b>Date et heure :</b> {new Date(trip.date_heure_depart).toLocaleString()}</Typography>
+          <Typography><b>Prix :</b> {trip.prix} €</Typography>
+          <Typography><b>Conducteur :</b> {trip.conducteur?.nom || 'N/A'}</Typography>
+          <Typography><b>Places disponibles :</b> {trip.places_disponibles}</Typography>
+        </Stack>
+        {reservationStatus && (
+          <Alert severity={reservationStatus.type} sx={{ mb: 2 }}>{reservationStatus.msg}</Alert>
+        )}
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={handleReservation}
+          disabled={resLoading}
+        >
+          {resLoading ? "Réservation..." : "Réserver ce trajet"}
+        </Button>
+      </Paper>
+    </Box>
+  );
+} 

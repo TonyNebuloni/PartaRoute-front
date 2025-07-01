@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -14,6 +14,12 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: "", mot_de_passe: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -37,7 +43,13 @@ export default function Login() {
       localStorage.setItem("accessToken", token);
       localStorage.setItem("userId", decoded.id_utilisateur);
       localStorage.setItem("userRole", decoded.role);
-      navigate("/");
+      const redirect = localStorage.getItem('redirectAfterLogin');
+      if (redirect) {
+        localStorage.removeItem('redirectAfterLogin');
+        navigate(redirect);
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       console.error(err);
       setError(err.message);
