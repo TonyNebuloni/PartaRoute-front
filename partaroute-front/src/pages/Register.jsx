@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -14,6 +14,12 @@ export default function Register() {
   const [formData, setFormData] = useState({ nom: "", email: "", mot_de_passe: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -77,7 +83,7 @@ export default function Register() {
             <TextField
               label="Pseudo"
               name="nom"
-              placeholder="Joe Doe"
+              placeholder="Votre pseudo"
               value={formData.nom}
               onChange={handleChange}
               fullWidth
