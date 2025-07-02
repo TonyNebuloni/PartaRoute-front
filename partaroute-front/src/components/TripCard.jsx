@@ -16,7 +16,7 @@ export default function TripCard({ trajet }) {
   return (
     <Card
       sx={{ mb: 2, borderRadius: 3, boxShadow: 2, cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6 } }}
-      onClick={() => navigate(`/trajet/${trajet.id}`)}
+      onClick={() => navigate(`/trajet/${trajet.id_trajet}`)}
     >
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -24,7 +24,7 @@ export default function TripCard({ trajet }) {
             {villeDepart} → {villeArrivee}
           </Typography>
           <Typography variant="subtitle1" color="primary" fontWeight={700}>
-            {prix} €
+            {prix !== undefined && prix !== null && !isNaN(Number(prix)) ? Number(prix).toFixed(2) : prix} €
           </Typography>
         </Box>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>

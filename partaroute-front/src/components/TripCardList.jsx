@@ -12,7 +12,7 @@ export default function TripCardList({ trips }) {
   return (
     <Stack spacing={2}>
       {trips.map((trajet, idx) => (
-        <TripCard key={trajet.id_trajet || trajet._id || trajet.id || idx} trajet={{ ...trajet, id: trajet.id_trajet || trajet._id || trajet.id || idx }} />
+        <TripCard key={trajet.id_trajet || idx} trajet={trajet} />
       ))}
     </Stack>
   );

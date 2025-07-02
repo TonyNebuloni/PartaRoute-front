@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Typography, Paper, Stack, CircularProgress, Dialog, DialogTitle, DialogContent, IconButton, Button, useTheme, useMediaQuery } from "@mui/material";
+import { Box, Typography, Paper, Stack, CircularProgress, Dialog, DialogTitle, DialogContent, IconButton, Button, useTheme, useMediaQuery, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 import TripCardList from "../components/TripCardList";
 import TripForm from "../components/TripForm";
@@ -15,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import PaginationMUI from '../components/PaginationMUI';
 
 export default function Home() {
   const [prenom, setPrenom] = useState("");
@@ -24,25 +25,35 @@ export default function Home() {
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [villeDepart, setVilleDepart] = useState("");
+  const [villeArrivee, setVilleArrivee] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    // Fetch trajets pour tout le monde
     setLoading(true);
+    let url = `http://localhost:3000/api/trips?page=${page}&limit=${limit}`;
+    if (villeDepart) url += `&ville_depart=${encodeURIComponent(villeDepart)}`;
+    if (villeArrivee) url += `&ville_arrivee=${encodeURIComponent(villeArrivee)}`;
     axios
-      .get("http://localhost:3000/api/trips")
+      .get(url)
       .then((res) => {
         let tripsArr = [];
+        let totalCount = 0;
         if (Array.isArray(res.data)) {
           tripsArr = res.data;
         } else if (Array.isArray(res.data.data)) {
           tripsArr = res.data.data;
+          totalCount = res.data.total || 0;
         } else if (res.data.trips && Array.isArray(res.data.trips)) {
           tripsArr = res.data.trips;
         }
         setTrips(tripsArr);
+        setTotal(totalCount);
         setLoading(false);
       })
       .catch((err) => {
@@ -70,10 +81,23 @@ export default function Home() {
     } else {
       setIsConnected(false);
     }
-  }, []);
+  }, [page, limit, villeDepart, villeArrivee]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Les useEffect se déclenchent automatiquement
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   return (
-    <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="grey.100" px={1}>
+    <Box minHeight="100vh" display="flex" alignItems="stretch" justifyContent="flex-start" bgcolor="grey.100" px={1}>
       <Paper elevation={3} sx={{
         width: '100%',
         maxWidth: { xs: '100%', sm: '100%' },
@@ -82,30 +106,11 @@ export default function Home() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'stretch',
-        minHeight: { xs: '100vh', sm: 500 },
+        minHeight: 'calc(100vh - 64px)',
         boxSizing: 'border-box',
       }}>
         {/* Header */}
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={isMobile ? 2 : 4}>
-          {/* Logo placeholder */}
-          <Box sx={{ width: 48, height: 48, bgcolor: 'grey.300', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 24, color: 'grey.700' }}>
-            LOGO
-          </Box>
-          <Typography
-            variant={isMobile ? 'h5' : 'h3'}
-            align="center"
-            sx={{ flex: 1, fontFamily: 'Pacifico, cursive', fontSize: isMobile ? '1.5rem' : '2.5rem', letterSpacing: 2, color: 'black', textAlign: 'center' }}
-          >
-            PartaRoute
-          </Typography>
-          <IconButton
-            color="primary"
-            onClick={() => setDrawerOpen(true)}
-            sx={{ ml: 2 }}
-          >
-            <MenuIcon fontSize="large" />
-          </IconButton>
-        </Box>
+        {/* (Supprimé : logo et titre, maintenant dans la navbar globale) */}
         {/* Drawer menu burger */}
         <Drawer
           anchor="right"
@@ -170,7 +175,30 @@ export default function Home() {
           </DialogContent>
         </Dialog>
         {/* Contenu principal */}
-        <Box flex={1} display="flex" flexDirection="column" alignItems="center" justifyContent="center" mt={isMobile ? 1 : 4}>
+        <Box flex={1} display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" mt={isMobile ? 1 : 4}>
+          <form onSubmit={handleSearch} style={{ width: '100%', maxWidth: 600, marginBottom: 24 }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="center">
+              <TextField
+                label="Ville de départ"
+                variant="outlined"
+                size="small"
+                value={villeDepart}
+                onChange={e => setVilleDepart(e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label="Ville d'arrivée"
+                variant="outlined"
+                size="small"
+                value={villeArrivee}
+                onChange={e => setVilleArrivee(e.target.value)}
+                fullWidth
+              />
+              <Button type="submit" variant="contained" color="primary" sx={{ minWidth: 120, height: 40 }}>
+                Rechercher
+              </Button>
+            </Stack>
+          </form>
           <Typography
             variant="h5"
             align="center"
@@ -189,7 +217,16 @@ export default function Home() {
           ) : trips.length === 0 ? (
             <Typography align="center" sx={{ color: 'grey.600', mb: 2 }}>Aucun trajet disponible.</Typography>
           ) : (
-            <TripCardList trips={trips} />
+            <>
+              <TripCardList trips={trips} />
+              <PaginationMUI
+                page={page}
+                count={Math.ceil(total / limit) || 1}
+                onChange={handlePageChange}
+                limit={limit}
+                onLimitChange={handleLimitChange}
+              />
+            </>
           )}
         </Box>
       </Paper>
