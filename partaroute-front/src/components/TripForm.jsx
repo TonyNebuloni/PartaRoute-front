@@ -49,6 +49,7 @@ export default function TripForm({ onTripCreated }) {
         conditions: ""
       });
       if (onTripCreated) onTripCreated(res.data.data || res.data);
+      window.dispatchEvent(new Event('trajetCreated'));
     } catch (err) {
       setError(err.response?.data?.message || "Erreur lors de la création du trajet.");
     } finally {

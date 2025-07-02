@@ -11,20 +11,36 @@ export default function TripDetails() {
   const [reservationStatus, setReservationStatus] = useState(null);
   const [resLoading, setResLoading] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [userReservation, setUserReservation] = useState(null);
   const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`http://localhost:3000/api/trips`)
+    axios.get(`http://localhost:3000/api/trips/${id}`)
       .then(res => {
-        // Correction : filtrer sur id_trajet
-        const found = (res.data.data || res.data).find(t => String(t.id_trajet) === String(id));
-        if (!found) throw new Error("Trajet introuvable");
-        setTrip(found);
+        if (!res.data || !res.data.data) throw new Error("Trajet introuvable");
+        setTrip(res.data.data);
         setError("");
       })
       .catch(() => setError("Impossible de charger le trajet."))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    // Vérifie si l'utilisateur a déjà réservé ce trajet
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    axios.get("http://localhost:3000/api/reservations", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => {
+        const reservations = res.data.data || res.data;
+        const found = reservations.find(r => String(r.trajet_id) === String(id) && !["annulee", "refusee"].includes(r.statut));
+        if (found) setUserReservation(found);
+        else setUserReservation(null);
+      })
+      .catch(() => setUserReservation(null));
   }, [id]);
 
   const handleReservation = async () => {
@@ -55,8 +71,24 @@ export default function TripDetails() {
     }
   };
 
+  const handleDeleteTrip = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!trip?.id_trajet) return;
+    try {
+      await axios.delete(`http://localhost:3000/api/trips/${trip.id_trajet}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      navigate("/");
+    } catch (err) {
+      alert("Erreur lors de la suppression du trajet.");
+    }
+  };
+
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh"><CircularProgress /></Box>;
   if (error) return <Alert severity="error">{error}</Alert>;
+  if (!trip) return null;
+
+  const placesRestantes = (typeof trip?.places_disponibles === 'number' ? trip.places_disponibles : Number(trip.places_disponibles)) - (trip.reservations?.length || 0);
 
   return (
     <Box minHeight="100vh" bgcolor="grey.100" display="flex" justifyContent="center" alignItems="center" px={1}>
@@ -73,22 +105,65 @@ export default function TripDetails() {
         </Typography>
         <Stack spacing={1} mb={2}>
           <Typography><b>Date et heure :</b> {new Date(trip.date_heure_depart).toLocaleString()}</Typography>
-          <Typography><b>Prix :</b> {trip.prix} €</Typography>
+          <Typography><b>Prix :</b> {trip.prix !== undefined && trip.prix !== null && !isNaN(Number(trip.prix)) ? Number(trip.prix).toFixed(2) : trip.prix} €</Typography>
           <Typography><b>Conducteur :</b> {trip.conducteur?.nom || 'N/A'}</Typography>
-          <Typography><b>Places disponibles :</b> {trip.places_disponibles}</Typography>
+          <Typography><b>Places restantes :</b> {placesRestantes > 0 ? placesRestantes : 0}</Typography>
         </Stack>
-        {reservationStatus && (
+        {userReservation ? (
+          <Alert severity="info" sx={{ mb: 2 }}>Vous avez déjà une demande de réservation en cours pour ce trajet.</Alert>
+        ) : reservationStatus && (
           <Alert severity={reservationStatus.type} sx={{ mb: 2 }}>{reservationStatus.msg}</Alert>
         )}
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleReservation}
-          disabled={resLoading}
-        >
-          {resLoading ? "Réservation..." : "Réserver ce trajet"}
-        </Button>
+        {String(trip.conducteur?.id_utilisateur) === String(userId) ? (
+          <Stack spacing={1}>
+            <Button
+              variant="contained"
+              color="info"
+              fullWidth
+              onClick={() => navigate('/mes-trajets-conducteur')}
+            >
+              Gérer mon trajet
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              fullWidth
+              onClick={handleDeleteTrip}
+            >
+              Supprimer mon trajet
+            </Button>
+          </Stack>
+        ) : (
+          userReservation ? (
+            <Button
+              variant="contained"
+              color="info"
+              fullWidth
+              onClick={() => navigate('/mes-trajets')}
+            >
+              Voir le statut de ma réservation
+            </Button>
+          ) : reservationStatus && reservationStatus.type === "success" ? (
+            <Button
+              variant="contained"
+              color="success"
+              fullWidth
+              onClick={() => navigate('/mes-trajets')}
+            >
+              Voir mes trajets
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleReservation}
+              disabled={resLoading}
+            >
+              {resLoading ? "Réservation..." : "Réserver ce trajet"}
+            </Button>
+          )
+        )}
       </Paper>
     </Box>
   );
