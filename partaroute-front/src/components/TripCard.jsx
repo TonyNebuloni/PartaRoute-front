@@ -8,6 +8,7 @@ export default function TripCard({ trajet }) {
   const prix = trajet?.prix ?? 'N/A';
   const conducteur = trajet?.conducteur?.nom || 'N/A';
   const places = typeof trajet?.places_disponibles === 'number' || typeof trajet?.places_disponibles === 'string' ? trajet.places_disponibles : 'N/A';
+  const placesRestantes = (typeof trajet?.places_disponibles === 'number' ? trajet.places_disponibles : Number(trajet.places_disponibles)) - (trajet.reservations?.length || 0);
   let dateHeure = 'N/A';
   if (trajet?.date_heure_depart) {
     const d = new Date(trajet.date_heure_depart);
@@ -34,7 +35,7 @@ export default function TripCard({ trajet }) {
           Conducteur : {conducteur}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Places dispo : {places}
+          Places restantes : {placesRestantes > 0 ? placesRestantes : 0}
         </Typography>
       </CardContent>
     </Card>

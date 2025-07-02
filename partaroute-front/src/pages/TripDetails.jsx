@@ -86,6 +86,9 @@ export default function TripDetails() {
 
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh"><CircularProgress /></Box>;
   if (error) return <Alert severity="error">{error}</Alert>;
+  if (!trip) return null;
+
+  const placesRestantes = (typeof trip?.places_disponibles === 'number' ? trip.places_disponibles : Number(trip.places_disponibles)) - (trip.reservations?.length || 0);
 
   return (
     <Box minHeight="100vh" bgcolor="grey.100" display="flex" justifyContent="center" alignItems="center" px={1}>
@@ -104,7 +107,7 @@ export default function TripDetails() {
           <Typography><b>Date et heure :</b> {new Date(trip.date_heure_depart).toLocaleString()}</Typography>
           <Typography><b>Prix :</b> {trip.prix !== undefined && trip.prix !== null && !isNaN(Number(trip.prix)) ? Number(trip.prix).toFixed(2) : trip.prix} €</Typography>
           <Typography><b>Conducteur :</b> {trip.conducteur?.nom || 'N/A'}</Typography>
-          <Typography><b>Places disponibles :</b> {trip.places_disponibles}</Typography>
+          <Typography><b>Places restantes :</b> {placesRestantes > 0 ? placesRestantes : 0}</Typography>
         </Stack>
         {userReservation ? (
           <Alert severity="info" sx={{ mb: 2 }}>Vous avez déjà une demande de réservation en cours pour ce trajet.</Alert>
