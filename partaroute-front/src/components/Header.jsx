@@ -11,6 +11,7 @@ export default function Header({ onOpenCreateTrip }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
+  const userRole = localStorage.getItem("userRole");
   const isLogged = !!token;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notifCount, setNotifCount] = useState(0);
@@ -114,6 +115,30 @@ export default function Header({ onOpenCreateTrip }) {
                       <ListItemText primary="Mon Profil" />
                     </ListItemButton>
                   </ListItem>
+                  {userRole === 'admin' && (
+                    <>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Admin" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin/dashboard" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Dashboard" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin/trips" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Trajets (admin)" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin/reservations" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Réservations (admin)" />
+                        </ListItemButton>
+                      </ListItem>
+                    </>
+                  )}
                   <Divider />
                   <ListItem disablePadding>
                     <ListItemButton onClick={handleCreateTrip}>
