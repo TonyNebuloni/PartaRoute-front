@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Typography, Paper, Stack, Button, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import ProfilePhotoUploader from "../components/ProfilePhotoUploader";
+
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function MyProfile() {
   const [user, setUser] = useState(null);
@@ -22,7 +25,7 @@ export default function MyProfile() {
       navigate("/login");
       return;
     }
-    axios.get(`http://localhost:3000/api/user/${id}`, {
+    axios.get(`${BACKEND_URL}/api/user/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
@@ -45,7 +48,7 @@ export default function MyProfile() {
     e.preventDefault();
     setSaving(true);
     const token = localStorage.getItem("accessToken");
-    axios.put("http://localhost:3000/api/user/edit", editData, {
+    axios.put(`${BACKEND_URL}/api/user/edit`, editData, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
@@ -68,7 +71,7 @@ export default function MyProfile() {
   const handleDelete = () => {
     setDeleteLoading(true);
     const token = localStorage.getItem("accessToken");
-    axios.delete("http://localhost:3000/api/user/delete", {
+    axios.delete(`${BACKEND_URL}/api/user/delete`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(() => {
@@ -105,6 +108,7 @@ export default function MyProfile() {
       )}
       <Paper elevation={3} sx={{ p: 4, minWidth: 320, maxWidth: 400, filter: redirecting ? 'blur(2px)' : 'none', pointerEvents: redirecting ? 'none' : 'auto', opacity: redirecting ? 0.5 : 1 }}>
         <Typography variant="h5" align="center" gutterBottom>Mon Profil</Typography>
+        <ProfilePhotoUploader />
         <form onSubmit={handleSave}>
           <Stack spacing={2}>
             <TextField label="Nom" name="nom" value={editData.nom} onChange={handleChange} fullWidth required />

@@ -14,6 +14,16 @@ export default function TripCard({ trajet, showPlacesRestantes = false, showSimp
     const d = new Date(trajet.date_heure_depart);
     dateHeure = isNaN(d.getTime()) ? 'N/A' : d.toLocaleString();
   }
+  const BACKEND_URL = import.meta.env.VITE_API_URL;
+  const DEFAULT_PHOTO = `${BACKEND_URL}/uploads/profile_photos/default.png`;
+  let conducteurPhoto = conducteur?.photo_profil;
+  if (conducteurPhoto) {
+    if (conducteurPhoto.startsWith('/uploads/')) {
+      conducteurPhoto = BACKEND_URL + conducteurPhoto;
+    }
+  } else {
+    conducteurPhoto = DEFAULT_PHOTO;
+  }
   return (
     <Card
       sx={{
@@ -31,7 +41,7 @@ export default function TripCard({ trajet, showPlacesRestantes = false, showSimp
     >
       <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
         <Avatar
-          src={conducteur?.photo_profil}
+          src={conducteurPhoto}
           alt={conducteur?.nom || 'Conducteur'}
           sx={{ width: 56, height: 56, mb: 1 }}
         />

@@ -10,6 +10,8 @@ import {
   Stack,
 } from "@mui/material";
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function Register() {
   const [formData, setFormData] = useState({ nom: "", email: "", mot_de_passe: "" });
   const [error, setError] = useState("");
@@ -29,7 +31,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("http://localhost:3000/api/auth/register", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -38,7 +40,7 @@ export default function Register() {
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Erreur lors de l'inscription.");
       }
-      const loginRes = await fetch("http://localhost:3000/api/auth/login", {
+      const loginRes = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -7,6 +7,8 @@ import TripForm from "../components/TripForm";
 import CloseIcon from "@mui/icons-material/Close";
 import PaginationMUI from '../components/PaginationMUI';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function Home() {
   const [prenom, setPrenom] = useState("");
   const [isConnected, setIsConnected] = useState(false);
@@ -25,7 +27,7 @@ export default function Home() {
 
   useEffect(() => {
     setLoading(true);
-    let url = `http://localhost:3000/api/trips?page=${page}&limit=${limit}`;
+    let url = `${BACKEND_URL}/api/trips?page=${page}&limit=${limit}`;
     if (villeDepart) url += `&ville_depart=${encodeURIComponent(villeDepart)}`;
     if (villeArrivee) url += `&ville_arrivee=${encodeURIComponent(villeArrivee)}`;
     axios
@@ -56,7 +58,7 @@ export default function Home() {
     if (token && id) {
       setIsConnected(true);
       axios
-        .get(`http://localhost:3000/api/user/${id}`, {
+        .get(`${BACKEND_URL}/api/user/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

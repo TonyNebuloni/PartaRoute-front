@@ -4,6 +4,8 @@ import axios from "axios";
 import PaginationMUI from '../components/PaginationMUI';
 import EditTripModal from '../components/EditTripModal';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function MyDriverTrips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ export default function MyDriverTrips() {
       return;
     }
     try {
-      const res = await axios.get(`http://localhost:3000/api/trips/conducteur/trajets?page=${pageArg}&limit=${limitArg}`, {
+      const res = await axios.get(`${BACKEND_URL}/api/trips/conducteur/trajets?page=${pageArg}&limit=${limitArg}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTrips(res.data.data || res.data);
@@ -54,7 +56,7 @@ export default function MyDriverTrips() {
   const handleStatut = async (id, statut) => {
     const token = localStorage.getItem("accessToken");
     try {
-      await axios.post(`http://localhost:3000/api/reservations/${id}/statut`, { statut }, {
+      await axios.post(`${BACKEND_URL}/api/reservations/${id}/statut`, { statut }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchTrips();
@@ -67,7 +69,7 @@ export default function MyDriverTrips() {
     if (!deleteId) return;
     const token = localStorage.getItem('accessToken');
     try {
-      await axios.delete(`http://localhost:3000/api/trips/${deleteId}`, {
+      await axios.delete(`${BACKEND_URL}/api/trips/${deleteId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSnackbar({ open: true, message: 'Trajet supprimé avec succès.' });

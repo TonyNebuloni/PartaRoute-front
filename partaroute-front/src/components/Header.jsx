@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function Header({ onOpenCreateTrip }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
@@ -19,7 +21,7 @@ export default function Header({ onOpenCreateTrip }) {
         setNotifCount(0);
         return;
       }
-      axios.get(`http://localhost:3000/api/notifications/utilisateur/${userId}`, {
+      axios.get(`${BACKEND_URL}/api/notifications/utilisateur/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => {

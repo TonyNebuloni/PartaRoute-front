@@ -10,6 +10,8 @@ import {
   Stack,
 } from "@mui/material";
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", mot_de_passe: "" });
   const [error, setError] = useState("");
@@ -29,7 +31,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

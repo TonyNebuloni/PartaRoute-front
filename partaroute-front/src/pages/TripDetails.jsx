@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Paper, Button, CircularProgress, Alert, Stack, Snackbar, Slide } from "@mui/material";
+import { Box, Typography, Paper, Button, CircularProgress, Alert, Stack, Snackbar, Slide, Avatar } from "@mui/material";
 import axios from "axios";
+import.meta.env.VITE_API_URL;
 
 export default function TripDetails() {
   const { id } = useParams();
@@ -14,10 +15,20 @@ export default function TripDetails() {
   const [userReservation, setUserReservation] = useState(null);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const BACKEND_URL = import.meta.env.VITE_API_URL;
+  const DEFAULT_PHOTO = `${BACKEND_URL}/uploads/profile_photos/default.png`;
+  let conducteurPhoto = trip?.conducteur?.photo_profil;
+  if (conducteurPhoto) {
+    if (conducteurPhoto.startsWith('/uploads/')) {
+      conducteurPhoto = BACKEND_URL + conducteurPhoto;
+    }
+  } else {
+    conducteurPhoto = DEFAULT_PHOTO;
+  }
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`http://localhost:3000/api/trips/${id}`)
+    axios.get(`${BACKEND_URL}/api/trips/${id}`)
       .then(res => {
         if (!res.data || !res.data.data) throw new Error("Trajet introuvable");
         setTrip(res.data.data);
@@ -31,7 +42,7 @@ export default function TripDetails() {
     // Vérifie si l'utilisateur a déjà réservé ce trajet
     const token = localStorage.getItem("accessToken");
     if (!token) return;
-    axios.get("http://localhost:3000/api/reservations", {
+    axios.get(`${BACKEND_URL}/api/reservations`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
@@ -59,7 +70,7 @@ export default function TripDetails() {
     }
     try {
       await axios.post(
-        "http://localhost:3000/api/reservations",
+        `${BACKEND_URL}/api/reservations`,
         { trajet_id: trip.id || trip._id || trip.id_trajet },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -75,7 +86,7 @@ export default function TripDetails() {
     const token = localStorage.getItem("accessToken");
     if (!trip?.id_trajet) return;
     try {
-      await axios.delete(`http://localhost:3000/api/trips/${trip.id_trajet}`, {
+      await axios.delete(`${BACKEND_URL}/api/trips/${trip.id_trajet}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       navigate("/");
@@ -100,6 +111,13 @@ export default function TripDetails() {
         ContentProps={{ sx: { bgcolor: '#7ed957', color: 'black', fontWeight: 600 } }}
       />
       <Paper sx={{ maxWidth: 500, width: '100%', p: 4, borderRadius: 4 }}>
+        <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
+          <Avatar
+            src={conducteurPhoto}
+            alt={trip.conducteur?.nom || 'Conducteur'}
+            sx={{ width: 72, height: 72, mb: 1, border: '2px solid #ccc' }}
+          />
+        </Box>
         <Typography variant="h4" align="center" sx={{ fontFamily: 'Pacifico, cursive', mb: 2 }}>
           {trip.ville_depart} → {trip.ville_arrivee}
         </Typography>
@@ -139,7 +157,7 @@ export default function TripDetails() {
               variant="contained"
               color="info"
               fullWidth
-              onClick={() => navigate('/mes-trajets')}
+              onClick={() => navigate('/my-trips')}
             >
               Voir le statut de ma réservation
             </Button>
@@ -148,7 +166,7 @@ export default function TripDetails() {
               variant="contained"
               color="success"
               fullWidth
-              onClick={() => navigate('/mes-trajets')}
+              onClick={() => navigate('/my-trips')}
             >
               Voir mes trajets
             </Button>

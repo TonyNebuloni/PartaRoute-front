@@ -5,6 +5,8 @@ import DoneIcon from '@mui/icons-material/Done';
 import axios from "axios";
 import PaginationMUI from '../components/PaginationMUI';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function Notifications() {
       return;
     }
     try {
-      const res = await axios.get(`http://localhost:3000/api/notifications/utilisateur/${userId}?page=${pageArg}&limit=${limitArg}`, {
+      const res = await axios.get(`${BACKEND_URL}/api/notifications/utilisateur/${userId}?page=${pageArg}&limit=${limitArg}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(res.data.data || res.data);
@@ -45,7 +47,7 @@ export default function Notifications() {
   const markAsRead = async (id) => {
     const token = localStorage.getItem("accessToken");
     try {
-      await axios.patch(`http://localhost:3000/api/notifications/${id}/lue`, {}, {
+      await axios.patch(`${BACKEND_URL}/api/notifications/${id}/lue`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchNotifications();
@@ -56,7 +58,7 @@ export default function Notifications() {
   const deleteNotif = async (id) => {
     const token = localStorage.getItem("accessToken");
     try {
-      await axios.delete(`http://localhost:3000/api/notifications/${id}`, {
+      await axios.delete(`${BACKEND_URL}/api/notifications/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchNotifications();
@@ -66,7 +68,7 @@ export default function Notifications() {
   const handleStatut = async (reservationId, statut, notifId) => {
     const token = localStorage.getItem("accessToken");
     try {
-      await axios.post(`http://localhost:3000/api/reservations/${reservationId}/statut`, { statut }, {
+      await axios.post(`${BACKEND_URL}/api/reservations/${reservationId}/statut`, { statut }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (notifId) await markAsRead(notifId);
@@ -80,7 +82,7 @@ export default function Notifications() {
     const token = localStorage.getItem("accessToken");
     try {
       const unread = notifications.filter(n => !n.lue);
-      await Promise.all(unread.map(n => axios.patch(`http://localhost:3000/api/notifications/${n.id_notification}/lue`, {}, {
+      await Promise.all(unread.map(n => axios.patch(`${BACKEND_URL}/api/notifications/${n.id_notification}/lue`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       })));
       fetchNotifications();
@@ -91,7 +93,7 @@ export default function Notifications() {
   const deleteAll = async () => {
     const token = localStorage.getItem("accessToken");
     try {
-      await Promise.all(notifications.map(n => axios.delete(`http://localhost:3000/api/notifications/${n.id_notification}`, {
+      await Promise.all(notifications.map(n => axios.delete(`${BACKEND_URL}/api/notifications/${n.id_notification}`, {
         headers: { Authorization: `Bearer ${token}` }
       })));
       fetchNotifications();
