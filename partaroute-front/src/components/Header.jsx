@@ -116,28 +116,11 @@ export default function Header({ onOpenCreateTrip }) {
                     </ListItemButton>
                   </ListItem>
                   {userRole === 'admin' && (
-                    <>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Admin" />
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin/dashboard" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Dashboard" />
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin/trips" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Trajets (admin)" />
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin/reservations" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Réservations (admin)" />
-                        </ListItemButton>
-                      </ListItem>
-                    </>
+                    <ListItem disablePadding>
+                      <ListItemButton component={Link} to="/admin" onClick={() => setDrawerOpen(false)}>
+                        <ListItemText primary="Admin" />
+                      </ListItemButton>
+                    </ListItem>
                   )}
                   <Divider />
                   <ListItem disablePadding>
