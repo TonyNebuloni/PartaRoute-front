@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Box, TextField, Button, Typography, Stack } from "@mui/material";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function TripForm({ onTripCreated }) {
   const [form, setForm] = useState({
     ville_depart: "",
@@ -28,7 +30,7 @@ export default function TripForm({ onTripCreated }) {
     try {
       const token = localStorage.getItem("accessToken");
       const res = await axios.post(
-        "http://localhost:3000/api/trips",
+        `${BACKEND_URL}/api/trips`,
         {
           ...form,
           places_disponibles: Number(form.places_disponibles),

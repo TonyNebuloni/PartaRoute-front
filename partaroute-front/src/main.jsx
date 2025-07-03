@@ -8,12 +8,12 @@ import axios from 'axios';
 axios.interceptors.response.use(
   response => response,
   error => {
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+    if (error.response && (error.response.status === 401 || error.response.status === 403 || error.response.status === 500)) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('userId');
       localStorage.removeItem('userRole');
       localStorage.setItem('redirectAfterLogin', window.location.pathname);
-      localStorage.setItem('loginMessage', 'Votre session a expiré, veuillez vous reconnecter.');
+      localStorage.setItem('loginMessage', 'Votre session a expiré ou une erreur est survenue, veuillez vous reconnecter.');
       window.location.href = '/login';
     }
     return Promise.reject(error);

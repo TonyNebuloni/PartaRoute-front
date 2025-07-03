@@ -3,13 +3,14 @@ import { Box, Typography, Paper, CircularProgress, Alert, Stack, Button } from "
 import axios from "axios";
 import PaginationMUI from '../components/PaginationMUI';
 
-export default function MesTrajets() {
+export default function MyTrips() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const userId = localStorage.getItem("userId");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const BACKEND_URL = import.meta.env.VITE_API_URL;
 
   const fetchReservations = async () => {
     setLoading(true);
@@ -21,7 +22,7 @@ export default function MesTrajets() {
       return;
     }
     try {
-      const res = await axios.get(`http://localhost:3000/api/reservations`, {
+      const res = await axios.get(`${BACKEND_URL}/api/reservations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setReservations(res.data.data || res.data);
@@ -40,7 +41,7 @@ export default function MesTrajets() {
   const handleCancel = async (id) => {
     const token = localStorage.getItem("accessToken");
     try {
-      await axios.patch(`http://localhost:3000/api/reservations/${id}/annuler`, {}, {
+      await axios.patch(`${BACKEND_URL}/api/reservations/${id}/annuler`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchReservations();
@@ -52,7 +53,7 @@ export default function MesTrajets() {
   const handleStatut = async (id, statut) => {
     const token = localStorage.getItem("accessToken");
     try {
-      await axios.post(`http://localhost:3000/api/reservations/${id}/statut`, { statut }, {
+      await axios.post(`${BACKEND_URL}/api/reservations/${id}/statut`, { statut }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchReservations();

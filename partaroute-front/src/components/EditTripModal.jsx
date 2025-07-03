@@ -5,6 +5,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function EditTripModal({ open, onClose, trip, onSuccess }) {
   const [form, setForm] = useState({
     ville_depart: '',
@@ -40,7 +42,7 @@ export default function EditTripModal({ open, onClose, trip, onSuccess }) {
     setError('');
     const token = localStorage.getItem('accessToken');
     try {
-      await axios.patch(`http://localhost:3000/api/trips/${trip.id_trajet}`, {
+      await axios.patch(`${BACKEND_URL}/api/trips/${trip.id_trajet}`, {
         ...form,
         places_disponibles: Number(form.places_disponibles),
         prix: Number(form.prix)

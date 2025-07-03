@@ -5,10 +5,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function Header({ onOpenCreateTrip }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
+  const userRole = localStorage.getItem("userRole");
   const isLogged = !!token;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notifCount, setNotifCount] = useState(0);
@@ -19,7 +22,7 @@ export default function Header({ onOpenCreateTrip }) {
         setNotifCount(0);
         return;
       }
-      axios.get(`http://localhost:3000/api/notifications/utilisateur/${userId}`, {
+      axios.get(`${BACKEND_URL}/api/notifications/utilisateur/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => {
@@ -88,7 +91,7 @@ export default function Header({ onOpenCreateTrip }) {
           <MenuIcon fontSize="large" />
         </IconButton>
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Box sx={{ width: 250 }} role="presentation" onClick={() => {}}>
+          <Box sx={{ width: 250 }} role="presentation">
             <List>
               <ListItem disablePadding>
                 <ListItemButton component={Link} to="/" onClick={() => setDrawerOpen(false)}>
@@ -98,15 +101,44 @@ export default function Header({ onOpenCreateTrip }) {
               {isLogged && (
                 <>
                   <ListItem disablePadding>
-                    <ListItemButton component={Link} to="/mes-trajets" onClick={() => setDrawerOpen(false)}>
+                    <ListItemButton component={Link} to="/my-trips" onClick={() => setDrawerOpen(false)}>
                       <ListItemText primary="Mes trajets" />
                     </ListItemButton>
                   </ListItem>
                   <ListItem disablePadding>
-                    <ListItemButton component={Link} to="/mes-trajets-conducteur" onClick={() => setDrawerOpen(false)}>
+                    <ListItemButton component={Link} to="/my-driver-trips" onClick={() => setDrawerOpen(false)}>
                       <ListItemText primary="Mes trajets proposés" />
                     </ListItemButton>
                   </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton component={Link} to="/profile" onClick={() => setDrawerOpen(false)}>
+                      <ListItemText primary="Mon Profil" />
+                    </ListItemButton>
+                  </ListItem>
+                  {userRole === 'admin' && (
+                    <>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Admin" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin/dashboard" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Dashboard" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin/trips" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Trajets (admin)" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton component={Link} to="/admin/reservations" onClick={() => setDrawerOpen(false)}>
+                          <ListItemText primary="Réservations (admin)" />
+                        </ListItemButton>
+                      </ListItem>
+                    </>
+                  )}
                   <Divider />
                   <ListItem disablePadding>
                     <ListItemButton onClick={handleCreateTrip}>
