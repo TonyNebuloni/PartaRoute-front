@@ -1,6 +1,7 @@
 import { AppBar, Toolbar, Typography, Box, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText, Divider, Badge } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import LockIcon from '@mui/icons-material/Lock';
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -98,6 +99,14 @@ export default function Header({ onOpenCreateTrip }) {
                   <ListItemText primary="Accueil" />
                 </ListItemButton>
               </ListItem>
+              {userRole === 'admin' && (
+                <ListItem disablePadding>
+                  <ListItemButton component={Link} to="/admin" onClick={() => setDrawerOpen(false)}>
+                    <LockIcon sx={{ mr: 1 }} />
+                    <ListItemText primary="Admin" />
+                  </ListItemButton>
+                </ListItem>
+              )}
               {isLogged && (
                 <>
                   <ListItem disablePadding>
@@ -115,30 +124,6 @@ export default function Header({ onOpenCreateTrip }) {
                       <ListItemText primary="Mon Profil" />
                     </ListItemButton>
                   </ListItem>
-                  {userRole === 'admin' && (
-                    <>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Admin" />
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin/dashboard" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Dashboard" />
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin/trips" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Trajets (admin)" />
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem disablePadding>
-                        <ListItemButton component={Link} to="/admin/reservations" onClick={() => setDrawerOpen(false)}>
-                          <ListItemText primary="Réservations (admin)" />
-                        </ListItemButton>
-                      </ListItem>
-                    </>
-                  )}
                   <Divider />
                   <ListItem disablePadding>
                     <ListItemButton onClick={handleCreateTrip}>
