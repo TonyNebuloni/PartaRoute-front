@@ -3,9 +3,10 @@ import Login from "../pages/Login.jsx";
 import Register from "../pages/Register.jsx";
 import Home from "../pages/HomePage.jsx";
 import TripDetails from "../pages/TripDetails.jsx";
-import MesTrajets from "../pages/MesTrajets.jsx";
-import MesTrajetsConducteur from "../pages/MesTrajetsConducteur.jsx";
+import MyTrips from "../pages/MyTrips.jsx";
+import MyDriverTrips from "../pages/MyDriverTrips.jsx";
 import Notifications from "../pages/Notifications.jsx";
+import MyProfile from "../pages/MyProfile.jsx";
 import Header from "../components/Header";
 // import Dashboard from "../pages/Dashboard";
 
@@ -18,9 +19,10 @@ export default function AppRouter({ onOpenCreateTrip }) {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/trajet/:id" element={<TripDetails />} />
-        <Route path="/mes-trajets" element={<MesTrajets />} />
-        <Route path="/mes-trajets-conducteur" element={<MesTrajetsConducteur />} />
+        <Route path="/my-trips" element={<MyTrips />} />
+        <Route path="/my-driver-trips" element={<MyDriverTrips />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/profile" element={<MyProfile />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
       </Routes>
     </BrowserRouter>

@@ -88,7 +88,7 @@ export default function Header({ onOpenCreateTrip }) {
           <MenuIcon fontSize="large" />
         </IconButton>
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Box sx={{ width: 250 }} role="presentation" onClick={() => {}}>
+          <Box sx={{ width: 250 }} role="presentation">
             <List>
               <ListItem disablePadding>
                 <ListItemButton component={Link} to="/" onClick={() => setDrawerOpen(false)}>
@@ -98,13 +98,18 @@ export default function Header({ onOpenCreateTrip }) {
               {isLogged && (
                 <>
                   <ListItem disablePadding>
-                    <ListItemButton component={Link} to="/mes-trajets" onClick={() => setDrawerOpen(false)}>
+                    <ListItemButton component={Link} to="/my-trips" onClick={() => setDrawerOpen(false)}>
                       <ListItemText primary="Mes trajets" />
                     </ListItemButton>
                   </ListItem>
                   <ListItem disablePadding>
-                    <ListItemButton component={Link} to="/mes-trajets-conducteur" onClick={() => setDrawerOpen(false)}>
+                    <ListItemButton component={Link} to="/my-driver-trips" onClick={() => setDrawerOpen(false)}>
                       <ListItemText primary="Mes trajets proposés" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton component={Link} to="/profile" onClick={() => setDrawerOpen(false)}>
+                      <ListItemText primary="Mon Profil" />
                     </ListItemButton>
                   </ListItem>
                   <Divider />

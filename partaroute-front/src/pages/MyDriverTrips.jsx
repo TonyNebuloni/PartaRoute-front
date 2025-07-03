@@ -4,7 +4,7 @@ import axios from "axios";
 import PaginationMUI from '../components/PaginationMUI';
 import EditTripModal from '../components/EditTripModal';
 
-export default function MesTrajetsConducteur() {
+export default function MyDriverTrips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

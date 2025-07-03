@@ -3,7 +3,7 @@ import { Box, Typography, Paper, CircularProgress, Alert, Stack, Button } from "
 import axios from "axios";
 import PaginationMUI from '../components/PaginationMUI';
 
-export default function MesTrajets() {
+export default function MyTrips() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

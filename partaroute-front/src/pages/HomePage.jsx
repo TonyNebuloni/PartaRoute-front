@@ -5,16 +5,6 @@ import { Link } from "react-router-dom";
 import TripCardList from "../components/TripCardList";
 import TripForm from "../components/TripForm";
 import CloseIcon from "@mui/icons-material/Close";
-import MenuIcon from '@mui/icons-material/Menu';
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import LogoutIcon from '@mui/icons-material/Logout';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PaginationMUI from '../components/PaginationMUI';
 
 export default function Home() {
@@ -24,7 +14,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [villeDepart, setVilleDepart] = useState("");
   const [villeArrivee, setVilleArrivee] = useState("");
   const [page, setPage] = useState(1);
@@ -96,6 +85,47 @@ export default function Home() {
     setPage(1);
   };
 
+  // MOCK DATA pour démo
+  const DEMO_CONDUCTEURS = [
+    {
+      id_utilisateur: 1,
+      nom: "Alice Martin",
+      photo_profil: "https://randomuser.me/api/portraits/women/1.jpg"
+    },
+    {
+      id_utilisateur: 2,
+      nom: "Bob Dupont",
+      photo_profil: "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    {
+      id_utilisateur: 3,
+      nom: "Chloé Bernard",
+      photo_profil: "https://randomuser.me/api/portraits/women/3.jpg"
+    },
+    {
+      id_utilisateur: 4,
+      nom: "David Leroy",
+      photo_profil: "https://randomuser.me/api/portraits/men/4.jpg"
+    }
+  ];
+  const DEMO_VILLES = ["Paris", "Lyon", "Marseille", "Toulouse", "Nantes", "Lille", "Bordeaux", "Nice"];
+  const DEMO_TRAJETS = Array.from({ length: 20 }).map((_, i) => {
+    const conducteur = DEMO_CONDUCTEURS[i % 4];
+    const ville_depart = DEMO_VILLES[i % DEMO_VILLES.length];
+    let ville_arrivee = DEMO_VILLES[(i + 3) % DEMO_VILLES.length];
+    if (ville_arrivee === ville_depart) ville_arrivee = DEMO_VILLES[(i + 4) % DEMO_VILLES.length];
+    return {
+      id_trajet: 1000 + i,
+      conducteur_id: conducteur.id_utilisateur,
+      ville_depart,
+      ville_arrivee,
+      date_heure_depart: new Date(Date.now() + i * 3600 * 1000).toISOString(),
+      places_disponibles: 1 + (i % 5),
+      prix: (10 + (i * 2.5)).toFixed(2),
+      conducteur
+    };
+  });
+
   return (
     <Box minHeight="100vh" display="flex" alignItems="stretch" justifyContent="flex-start" bgcolor="grey.100" px={1}>
       <Paper elevation={3} sx={{
@@ -111,52 +141,6 @@ export default function Home() {
       }}>
         {/* Header */}
         {/* (Supprimé : logo et titre, maintenant dans la navbar globale) */}
-        {/* Drawer menu burger */}
-        <Drawer
-          anchor="right"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-        >
-          <Box sx={{ width: 250 }} role="presentation" onClick={() => setDrawerOpen(false)}>
-            <List>
-              {isConnected ? (
-                <>
-                  <ListItem disablePadding>
-                    <ListItemButton onClick={() => setOpen(true)}>
-                      <ListItemIcon><AddCircleOutlineIcon color="primary" /></ListItemIcon>
-                      <ListItemText primary="Créer un trajet" />
-                    </ListItemButton>
-                  </ListItem>
-                  <Divider />
-                  <ListItem disablePadding>
-                    <ListItemButton onClick={() => {
-                      localStorage.removeItem('accessToken');
-                      localStorage.removeItem('userId');
-                      localStorage.removeItem('userRole');
-                      window.location.reload();
-                    }}>
-                      <ListItemIcon><LogoutIcon color="secondary" /></ListItemIcon>
-                      <ListItemText primary="Déconnexion" />
-                    </ListItemButton>
-                  </ListItem>
-                </>
-              ) : (
-                <>
-                  <ListItem disablePadding>
-                    <ListItemButton component="a" href="/login">
-                      <ListItemText primary="Se connecter" />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding>
-                    <ListItemButton component="a" href="/register">
-                      <ListItemText primary="S'inscrire" />
-                    </ListItemButton>
-                  </ListItem>
-                </>
-              )}
-            </List>
-          </Box>
-        </Drawer>
         {/* Modale création trajet */}
         <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
@@ -218,7 +202,7 @@ export default function Home() {
             <Typography align="center" sx={{ color: 'grey.600', mb: 2 }}>Aucun trajet disponible.</Typography>
           ) : (
             <>
-              <TripCardList trips={trips} />
+              <TripCardList trips={trips.length === 0 ? DEMO_TRAJETS : trips} showPlacesRestantes={false} showSimple={true} />
               <PaginationMUI
                 page={page}
                 count={Math.ceil(total / limit) || 1}
