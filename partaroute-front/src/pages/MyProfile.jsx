@@ -136,13 +136,13 @@ export default function MyProfile() {
   };
 
   if (loading) return (
-    <Box minHeight="100vh" bgcolor="#222" display="flex" alignItems="center" justifyContent="center">
+    <Box minHeight="100vh" bgcolor="#232323" display="flex" alignItems="center" justifyContent="center">
       <CircularProgress sx={{ color: '#D6FFB7' }} />
     </Box>
   );
 
   if (error) return (
-    <Box minHeight="100vh" bgcolor="#222" display="flex" alignItems="center" justifyContent="center">
+    <Box minHeight="100vh" bgcolor="#232323" display="flex" alignItems="center" justifyContent="center">
       <Typography color="#D6FFB7" align="center" sx={{ fontFamily: 'Gluten, cursive', fontSize: 'clamp(1rem, 4vw, 1.2rem)' }}>
         {error}
       </Typography>
@@ -150,7 +150,7 @@ export default function MyProfile() {
   );
 
   return (
-    <Box minHeight="150vh" bgcolor="#222" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" fontFamily="'Gluten', cursive">
+    <Box minHeight="150vh" bgcolor="#232323" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" fontFamily="'Gluten', cursive">
       {redirecting && (
         <Box position="fixed" top={0} left={0} width="100vw" height="100vh" zIndex={2000} bgcolor="rgba(0,0,0,0.7)" display="flex" alignItems="center" justifyContent="center">
           <CircularProgress size={60} sx={{ color: '#D6FFB7' }} />
@@ -158,7 +158,7 @@ export default function MyProfile() {
       )}
       
       {/* Header noir avec logo */}
-      <Box width="100%" maxWidth="500px" bgcolor="#222" pt="8vw" pb="4vw" borderTopLeftRadius={0} borderTopRightRadius={0} display="flex" flexDirection="column" alignItems="center">
+      <Box width="100%" maxWidth="500px" bgcolor="#232323" pt="8vw" pb="4vw" borderTopLeftRadius={0} borderTopRightRadius={0} display="flex" flexDirection="column" alignItems="center">
         <Box mb="2vw" width="40vw" maxWidth="250px">
           <img src={logoIcon} alt="Logo PartaRoute" style={{ width: '100%', height: 'auto', display: 'block' }} />
         </Box>
@@ -350,7 +350,7 @@ export default function MyProfile() {
               disabled={saving}
               sx={{
                 mt: '2vw',
-                bgcolor: '#222',
+                bgcolor: '#232323',
                 color: 'white',
                 borderRadius: '999px',
                 fontWeight: 'bold',
@@ -377,7 +377,7 @@ export default function MyProfile() {
             onClick={() => setLogoutDialog(true)}
             sx={{
               borderColor: '#D6FFB7',
-              color: '#222',
+              color: '#232323',
               borderRadius: '999px',
               fontWeight: 'bold',
               py: '3vw',
@@ -387,7 +387,7 @@ export default function MyProfile() {
               '&:hover': { 
                 borderColor: '#D6FFB7',
                 bgcolor: '#D6FFB7',
-                color: '#222'
+                color: '#232323'
               },
             }}
           >

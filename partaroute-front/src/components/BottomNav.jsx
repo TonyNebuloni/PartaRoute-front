@@ -11,21 +11,21 @@ const navItems = [
   },
   {
     label: 'Remontées',
-    path: '/remontees',
+    path: '/my-driver-trips',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="7" rx="2"/><path d="M16 11V7a4 4 0 0 0-8 0v4"/></svg>
     ),
   },
   {
     label: 'Mes trajets',
-    path: '/mes-trajets',
+    path: '/my-trips',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg>
     ),
   },
   {
     label: 'Actus',
-    path: '/actus',
+    path: '/notifications',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h2"/></svg>
     ),
@@ -40,9 +40,9 @@ const navItems = [
 ];
 
 const activeColor = '#D6FFB7';
-const barBg = '#393939';
-const iconInactive = '#A0A0A0';
-const iconActive = '#222';
+const barBg = '#232323';
+const iconInactive = '#ffffff';
+const iconActive = '#232323';
 
 export default function BottomNav() {
   const location = useLocation();
@@ -125,7 +125,7 @@ export default function BottomNav() {
                         transition: 'transform 0.3s cubic-bezier(.4,1.6,.6,1), opacity 0.3s',
                         width: '48px',
                         height: '48px',
-                        background: '#222',
+                        background: '#232323',
                         borderRadius: '50%',
                         border: `3px solid ${activeColor}`,
                         display: 'flex',

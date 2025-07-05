@@ -89,7 +89,7 @@ export default function Home() {
         setTotal(totalCount);
         setLoading(false);
         
-        // Extraire les villes disponibles
+        // Extraire les villes disponibles depuis les vraies données
         const cities = [...new Set(tripsArr.map(trip => trip.ville_depart))];
         setAvailableCities(cities);
       })
@@ -229,56 +229,12 @@ export default function Home() {
     scrollRef.current.startX = null;
   };
 
-  // MOCK DATA pour démo - PRIORITÉ AUX VILLES FRANÇAISES
-  const DEMO_CONDUCTEURS = [
-    {
-      id_utilisateur: 1,
-      nom: "Alice Martin",
-      photo_profil: "https://randomuser.me/api/portraits/women/1.jpg"
-    },
-    {
-      id_utilisateur: 2,
-      nom: "Bob Dupont",
-      photo_profil: "https://randomuser.me/api/portraits/men/2.jpg"
-    },
-    {
-      id_utilisateur: 3,
-      nom: "Chloé Bernard",
-      photo_profil: "https://randomuser.me/api/portraits/women/3.jpg"
-    },
-    {
-      id_utilisateur: 4,
-      nom: "David Leroy",
-      photo_profil: "https://randomuser.me/api/portraits/men/4.jpg"
-    }
-  ];
-  
-  // VILLES FRANÇAISES PRIORITAIRES avec diversité pour avoir des trajets de chaque ville
-  const DEMO_VILLES_FRANCAISES = ["Paris", "Lyon", "Marseille", "Toulouse", "Nice", "Nantes", "Bordeaux", "Lille", "Montpellier", "Strasbourg", "Cannes", "Antibes"];
-  
-  const DEMO_TRAJETS = Array.from({ length: 24 }).map((_, i) => {
-    const conducteur = DEMO_CONDUCTEURS[i % 4];
-    const ville_depart = DEMO_VILLES_FRANCAISES[i % DEMO_VILLES_FRANCAISES.length];
-    let ville_arrivee = DEMO_VILLES_FRANCAISES[(i + 3) % DEMO_VILLES_FRANCAISES.length];
-    if (ville_arrivee === ville_depart) ville_arrivee = DEMO_VILLES_FRANCAISES[(i + 4) % DEMO_VILLES_FRANCAISES.length];
-    return {
-      id_trajet: 1000 + i,
-      conducteur_id: conducteur.id_utilisateur,
-      ville_depart,
-      ville_arrivee,
-      date_heure_depart: new Date(Date.now() + i * 3600 * 1000).toISOString(),
-      places_disponibles: 1 + (i % 5),
-      prix: (10 + (i * 2.5)).toFixed(2),
-      conducteur
-    };
-  });
-
   return (
     <Box sx={{ minHeight: '100vh', pb: '100px' }}>
       {/* Section supérieure grise */}
       <Box 
         sx={{
-          bgcolor: '#393939',
+          bgcolor: '#232323',
           color: 'white',
           fontFamily: 'Gluten, cursive',
           position: 'relative',
@@ -417,7 +373,7 @@ export default function Home() {
                     sx={{
                       width: '5vw',
                       height: '5vw',
-                      bgcolor: '#222',
+                      bgcolor: '#232323',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
@@ -476,7 +432,7 @@ export default function Home() {
                     sx={{
                       width: '5vw',
                       height: '5vw',
-                      bgcolor: '#222',
+                      bgcolor: '#232323',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
@@ -561,7 +517,7 @@ export default function Home() {
         )}
 
         {/* Aucun trajet */}
-        {!loading && !error && (trips.length === 0 && DEMO_TRAJETS.length === 0) && (
+        {!loading && !error && (trips.length === 0) && (
           <Typography 
             sx={{ 
               fontFamily: 'Gluten, cursive',
@@ -596,11 +552,11 @@ export default function Home() {
             }}
           >
             {(() => {
-              // FORCER l'utilisation des données DEMO françaises au lieu de l'API américaine
-              const tripsToShow = DEMO_TRAJETS; // Toujours utiliser les données françaises
+              // Utiliser les vraies données de l'API maintenant qu'elles contiennent des villes françaises
+              const tripsToShow = trips.length > 0 ? trips : [];
               
-              console.log('Using DEMO French trips instead of API data');
-              console.log('DEMO trips:', DEMO_TRAJETS.map(t => `${t.ville_depart} -> ${t.ville_arrivee}`));
+              console.log('Using real API data with French cities');
+              console.log('API trips:', tripsToShow.map(t => `${t.ville_depart} -> ${t.ville_arrivee}`));
               console.log('Current selected city:', currentCity);
               
               // Liste des villes françaises pour le tri
@@ -688,6 +644,32 @@ export default function Home() {
                       background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)',
                     }}
                   />
+                  
+                  {/* Badge "COMPLET" si places_disponibles === 0 */}
+                  {trip.places_disponibles === 0 && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        bgcolor: '#ff4444',
+                        color: 'white',
+                        px: '8px',
+                        py: '4px',
+                        borderRadius: '12px',
+                        fontSize: 'clamp(0.6rem, 2.5vw, 0.8rem)',
+                        fontFamily: 'Gluten, cursive',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        zIndex: 10,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                      }}
+                    >
+                      COMPLET
+                    </Box>
+                  )}
+                  
                   <CardContent 
                     sx={{
                       position: 'absolute',
@@ -729,16 +711,30 @@ export default function Home() {
                           €
                         </Typography>
                       </Box>
-                      <Typography 
-                        sx={{ 
-                          fontFamily: 'Gluten, cursive',
-                          fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
-                          opacity: 0.9,
-                          textDecoration: 'underline',
-                        }}
-                      >
-                        plus de détails ?
-                      </Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <Typography 
+                          sx={{ 
+                            fontFamily: 'Gluten, cursive',
+                            fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                            opacity: 0.9,
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          plus de détails ?
+                        </Typography>
+                        {trip.places_disponibles > 0 && (
+                          <Typography 
+                            sx={{ 
+                              fontFamily: 'Gluten, cursive',
+                              fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                              opacity: 0.8,
+                              mt: '0.5vw',
+                            }}
+                          >
+                            {trip.places_disponibles} place{trip.places_disponibles > 1 ? 's' : ''} restante{trip.places_disponibles > 1 ? 's' : ''}
+                          </Typography>
+                        )}
+                      </Box>
                     </Box>
                   </CardContent>
                 </Card>
@@ -758,7 +754,7 @@ export default function Home() {
         <DialogTitle sx={{ 
           fontFamily: 'Gluten, cursive',
           textAlign: 'center',
-          bgcolor: '#393939',
+          bgcolor: '#232323',
           color: 'white'
         }}>
           Choisir une ville
@@ -766,14 +762,17 @@ export default function Home() {
         <DialogContent sx={{ p: 0 }}>
           <List>
             {(() => {
-              // TOUJOURS utiliser les villes françaises pour le sélecteur
-              // car l'API retourne des villes américaines quand il n'y a pas de filtre
-              const citiesToShow = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Montpellier', 'Strasbourg', 'Cannes', 'Antibes', 'Monaco', 'Grasse'];
+              // Utiliser les villes disponibles depuis l'API + quelques villes françaises populaires
+              const apiCities = availableCities.length > 0 ? availableCities : [];
+              const popularFrenchCities = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Montpellier', 'Strasbourg', 'Cannes', 'Antibes'];
               
-              console.log('City selector: Using French cities by default');
-              console.log('Available cities:', citiesToShow);
+              // Combiner les villes de l'API avec les villes populaires, en évitant les doublons
+              const allCities = [...new Set([...apiCities, ...popularFrenchCities])].sort();
+              
+              console.log('City selector: Using API cities + popular French cities');
+              console.log('Available cities:', allCities);
 
-              return citiesToShow.map((city) => (
+              return allCities.map((city) => (
                 <ListItem 
                   key={city}
                   button

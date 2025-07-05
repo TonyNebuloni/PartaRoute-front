@@ -87,9 +87,9 @@ export default function Register() {
   };
 
   return (
-    <Box minHeight="100vh" bgcolor="#222" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" fontFamily="'Gluten', cursive">
+    <Box minHeight="100vh" bgcolor="#232323" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" fontFamily="'Gluten', cursive">
       {/* Header noir avec logo et nom */}
-      <Box width="100%" maxWidth="500px" bgcolor="#222" pt="8vw" pb="4vw" borderTopLeftRadius={0} borderTopRightRadius={0} display="flex" flexDirection="column" alignItems="center">
+      <Box width="100%" maxWidth="500px" bgcolor="#232323" pt="8vw" pb="4vw" borderTopLeftRadius={0} borderTopRightRadius={0} display="flex" flexDirection="column" alignItems="center">
         <Box mb="2vw" width="40vw" maxWidth="250px">
           <img src={logoIcon} alt="Logo PartaRoute" style={{ width: '100%', height: 'auto', display: 'block' }} />
         </Box>
@@ -281,17 +281,19 @@ export default function Register() {
               fullWidth
               sx={{
                 mt: '2vw',
-                bgcolor: '#222',
+                bgcolor: '#232323',
                 color: 'white',
                 borderRadius: '999px',
                 fontWeight: 'bold',
-                py: '3.5vw',
-                fontSize: 'clamp(1rem, 4vw, 1.2rem)',
-                letterSpacing: 1,
-                boxShadow: 2,
+                fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
                 fontFamily: 'Gluten, cursive',
-                '&:active': { transform: 'scale(0.97)' },
-                '&:hover': { bgcolor: '#111' },
+                py: '2.5vw',
+                px: '8vw',
+                maxWidth: '300px',
+                width: '80%',
+                '&:hover': {
+                  bgcolor: '#333',
+                },
               }}
             >
               REJOINDRE PARTAROUTE
