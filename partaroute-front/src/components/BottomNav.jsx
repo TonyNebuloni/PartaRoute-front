@@ -60,7 +60,6 @@ export default function BottomNav() {
         alignItems: 'flex-end',
         height: '70px',
         zIndex: 100,
-        boxShadow: '0 -2px 12px rgba(0,0,0,0.08)',
       }}
     >
       {navItems.map((item, idx) => {
@@ -110,9 +109,8 @@ export default function BottomNav() {
                         transition: 'transform 0.3s cubic-bezier(.4,1.6,.6,1), opacity 0.3s',
                         width: '60px',
                         height: '60px',
-                        background: '#fff',
+                        background: '#ffffff',
                         borderRadius: '50%',
-                        boxShadow: '0 2px 12px rgba(0,0,0,0.10)',
                         position: 'absolute',
                         left: '50%',
                         top: '50%',
