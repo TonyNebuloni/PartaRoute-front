@@ -9,8 +9,30 @@ import {
   Button,
   Stack,
 } from "@mui/material";
+import logoIcon from '../assets/logo_icon.png';
 
-const BACKEND_URL = import.meta.env.VITE_API_URL;
+// Ajout de la police Google Fonts via une balise <link>
+if (!document.getElementById('google-font-gluten')) {
+  const preconnect1 = document.createElement('link');
+  preconnect1.rel = 'preconnect';
+  preconnect1.href = 'https://fonts.googleapis.com';
+  document.head.appendChild(preconnect1);
+  
+  const preconnect2 = document.createElement('link');
+  preconnect2.rel = 'preconnect';
+  preconnect2.href = 'https://fonts.gstatic.com';
+  preconnect2.crossOrigin = 'anonymous';
+  document.head.appendChild(preconnect2);
+  
+  const link = document.createElement('link');
+  link.id = 'google-font-gluten';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Gluten:wght@100..900&display=swap';
+  document.head.appendChild(link);
+}
+
+//const BACKEND_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = "http://localhost:3000";
 
 export default function Register() {
   const [formData, setFormData] = useState({ nom: "", email: "", mot_de_passe: "" });
@@ -65,32 +87,93 @@ export default function Register() {
   };
 
   return (
-    <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="grey.100" px={1}>
-      <Paper elevation={3} sx={{ width: '100%', maxWidth: 400, borderTopLeftRadius: 24, borderTopRightRadius: 24, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box minHeight="100vh" bgcolor="#222" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" fontFamily="'Gluten', cursive">
+      {/* Header noir avec logo et nom */}
+      <Box width="100%" maxWidth="500px" bgcolor="#222" pt="8vw" pb="4vw" borderTopLeftRadius={0} borderTopRightRadius={0} display="flex" flexDirection="column" alignItems="center">
+        <Box mb="2vw" width="40vw" maxWidth="250px">
+          <img src={logoIcon} alt="Logo PartaRoute" style={{ width: '100%', height: 'auto', display: 'block' }} />
+        </Box>
+      </Box>
+      {/* Formulaire blanc arrondi */}
+      <Paper elevation={3} sx={{
+        width: '100%',
+        minHeight: '100vh',
+        borderTopLeftRadius: '10vw',
+        borderTopRightRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        mt: 0,
+        p: '6vw',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        fontFamily: 'Gluten, cursive',
+        boxSizing: 'border-box',
+        backgroundColor: '#fff',
+      }}>
         <Typography
           variant="h3"
           align="center"
           gutterBottom
-          sx={{ fontFamily: 'Pacifico, cursive', fontSize: '2rem', mb: 3 }}
+          sx={{ fontFamily: 'Gluten, cursive', fontSize: 'clamp(1.2rem, 7vw, 2.2rem)', mb: '6vw', mt: '2vw' }}
         >
           Créer un compte
         </Typography>
         {error && (
-          <Typography color="error" align="center" variant="body2" sx={{ mb: 2 }}>
+          <Typography color="error" align="center" variant="body2" sx={{ mb: '4vw' }}>
             {error}
           </Typography>
         )}
         <Box component="form" onSubmit={handleSubmit} width="100%" noValidate>
-          <Stack spacing={2}>
+          <Stack spacing={3}>
             <TextField
-              label="Pseudo"
+              label="Prénom"
               name="nom"
-              placeholder="Votre pseudo"
+              placeholder="Joe Doe"
               value={formData.nom}
               onChange={handleChange}
               fullWidth
               required
-              InputProps={{ sx: { borderBottomLeftRadius: 16, borderRadius: 0 } }}
+              variant="standard"
+              InputProps={{ 
+                sx: { 
+                  fontFamily: 'Gluten, cursive', 
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  paddingLeft: '16px',
+                  paddingRight: '8px',
+                  paddingY: '4px',
+                  '&:before': {
+                    borderBottomColor: '#000',
+                    borderBottomWidth: '2px',
+                    
+                  },
+                  '&:after': {
+                    borderBottomColor: '#D6FFB7',
+                    borderBottomWidth: '2px',
+                    
+                    borderImage: 'linear-gradient(to right, #D6FFB7, #D6FFB7) 1',
+                  },
+                  '&:hover:not(.Mui-disabled):before': {
+                    borderBottomColor: '#000',
+                    
+                  },
+                  '&.Mui-focused:after': {
+                    borderBottomColor: '#D6FFB7',
+                    
+                  },
+                } 
+              }}
+              InputLabelProps={{ 
+                sx: { 
+                  fontFamily: 'Gluten, cursive', 
+                  fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                  color: '#000',
+                  paddingLeft: '16px',
+                  '&.Mui-focused': {
+                    color: '#000',
+                  },
+                } 
+              }}
             />
             <TextField
               label="Courriel"
@@ -101,42 +184,121 @@ export default function Register() {
               onChange={handleChange}
               fullWidth
               required
-              InputProps={{ sx: { borderBottomLeftRadius: 16, borderRadius: 0 } }}
+              variant="standard"
+              InputProps={{ 
+                sx: { 
+                  fontFamily: 'Gluten, cursive', 
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  paddingLeft: '16px',
+                  paddingRight: '8px',
+                  paddingY: '4px',
+                  '&:before': {
+                    borderBottomColor: '#000',
+                    borderBottomWidth: '2px',
+                    
+                  },
+                  '&:after': {
+                    borderBottomColor: '#D6FFB7',
+                    borderBottomWidth: '2px',
+                    
+                    borderImage: 'linear-gradient(to right, #D6FFB7, #D6FFB7) 1',
+                  },
+                  '&:hover:not(.Mui-disabled):before': {
+                    borderBottomColor: '#000',
+                    
+                  },
+                  '&.Mui-focused:after': {
+                    borderBottomColor: '#D6FFB7',
+                    
+                  },
+                } 
+              }}
+              InputLabelProps={{ 
+                sx: { 
+                  fontFamily: 'Gluten, cursive', 
+                  fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                  color: '#000',
+                  paddingLeft: '16px',
+                  '&.Mui-focused': {
+                    color: '#000',
+                  },
+                } 
+              }}
             />
             <TextField
               label="Mot de passe"
               name="mot_de_passe"
               type="password"
-              placeholder="Mot de passe"
+              placeholder="********************"
               value={formData.mot_de_passe}
               onChange={handleChange}
               fullWidth
               required
-              InputProps={{ sx: { borderBottomLeftRadius: 16, borderRadius: 0 } }}
+              variant="standard"
+              InputProps={{ 
+                sx: { 
+                  fontFamily: 'Gluten, cursive', 
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  paddingLeft: '16px',
+                  paddingRight: '8px',
+                  paddingY: '4px',
+                  '&:before': {
+                    borderBottomColor: '#000',
+                    borderBottomWidth: '2px',
+                    
+                  },
+                  '&:after': {
+                    borderBottomColor: '#D6FFB7',
+                    borderBottomWidth: '2px',
+                    
+                    borderImage: 'linear-gradient(to right, #D6FFB7, #D6FFB7) 1',
+                  },
+                  '&:hover:not(.Mui-disabled):before': {
+                    borderBottomColor: '#000',
+                    
+                  },
+                  '&.Mui-focused:after': {
+                    borderBottomColor: '#D6FFB7',
+                    
+                  },
+                } 
+              }}
+              InputLabelProps={{ 
+                sx: { 
+                  fontFamily: 'Gluten, cursive', 
+                  fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                  color: '#000',
+                  paddingLeft: '16px',
+                  '&.Mui-focused': {
+                    color: '#000',
+                  },
+                } 
+              }}
             />
             <Button
               type="submit"
               variant="contained"
               fullWidth
               sx={{
-                mt: 1,
-                bgcolor: 'black',
+                mt: '2vw',
+                bgcolor: '#222',
                 color: 'white',
-                borderRadius: 999,
+                borderRadius: '999px',
                 fontWeight: 'bold',
-                py: 1.5,
-                fontSize: '1rem',
+                py: '3.5vw',
+                fontSize: 'clamp(1rem, 4vw, 1.2rem)',
                 letterSpacing: 1,
                 boxShadow: 2,
+                fontFamily: 'Gluten, cursive',
                 '&:active': { transform: 'scale(0.97)' },
-                '&:hover': { bgcolor: '#222' },
+                '&:hover': { bgcolor: '#111' },
               }}
             >
               REJOINDRE PARTAROUTE
             </Button>
           </Stack>
         </Box>
-        <Typography variant="body2" align="center" sx={{ mt: 3, color: 'grey.800' }}>
+        <Typography variant="body2" align="center" sx={{ mt: '6vw', color: 'grey.800', fontFamily: 'Gluten, cursive', fontSize: 'clamp(0.9rem, 3vw, 1.1rem)' }}>
           Déjà un compte ?{' '}
           <Link to="/login" style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'none' }}>Se connecter</Link>
         </Typography>
