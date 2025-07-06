@@ -238,6 +238,7 @@ export default function Login() {
                 px: '8vw',
                 maxWidth: '300px',
                 width: '80%',
+                alignSelf: 'center',
                 '&:hover': {
                   bgcolor: '#333',
                 },

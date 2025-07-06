@@ -2,7 +2,27 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, Paper, Button, CircularProgress, Alert, Stack, Snackbar, Slide, Avatar } from "@mui/material";
 import axios from "axios";
-import.meta.env.VITE_API_URL;
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+// Ajout de la police Google Fonts via une balise <link>
+if (!document.getElementById('google-font-gluten')) {
+  const preconnect1 = document.createElement('link');
+  preconnect1.rel = 'preconnect';
+  preconnect1.href = 'https://fonts.googleapis.com';
+  document.head.appendChild(preconnect1);
+  
+  const preconnect2 = document.createElement('link');
+  preconnect2.rel = 'preconnect';
+  preconnect2.href = 'https://fonts.gstatic.com';
+  preconnect2.crossOrigin = 'anonymous';
+  document.head.appendChild(preconnect2);
+  
+  const link = document.createElement('link');
+  link.id = 'google-font-gluten';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Gluten:wght@100..900&display=swap';
+  document.head.appendChild(link);
+}
 
 export default function TripDetails() {
   const { id } = useParams();
@@ -95,93 +115,361 @@ export default function TripDetails() {
     }
   };
 
-  if (loading) return <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh"><CircularProgress /></Box>;
-  if (error) return <Alert severity="error">{error}</Alert>;
+  if (loading) return (
+    <Box minHeight="100vh" bgcolor="#232323" display="flex" alignItems="center" justifyContent="center">
+      <CircularProgress sx={{ color: '#D6FFB7' }} />
+    </Box>
+  );
+  
+  if (error) return (
+    <Box minHeight="100vh" bgcolor="#232323" display="flex" alignItems="center" justifyContent="center" p="6vw">
+      <Typography color="#D6FFB7" align="center" sx={{ fontFamily: 'Gluten, cursive', fontSize: 'clamp(1rem, 4vw, 1.2rem)' }}>
+        {error}
+      </Typography>
+    </Box>
+  );
+  
   if (!trip) return null;
 
   const placesRestantes = (typeof trip?.places_disponibles === 'number' ? trip.places_disponibles : Number(trip.places_disponibles)) - (trip.reservations?.length || 0);
 
   return (
-    <Box minHeight="100vh" bgcolor="grey.100" display="flex" justifyContent="center" alignItems="center" px={1}>
+    <Box minHeight="100vh" bgcolor="#232323" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" fontFamily="'Gluten', cursive">
       <Snackbar
         open={notifOpen}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         TransitionComponent={Slide}
-        message={<span style={{ color: 'black', fontWeight: 600 }}>Connecte-toi pour réserver !</span>}
-        ContentProps={{ sx: { bgcolor: '#7ed957', color: 'black', fontWeight: 600 } }}
+        message={<span style={{ color: 'black', fontWeight: 600, fontFamily: 'Gluten, cursive' }}>Connecte-toi pour réserver !</span>}
+        ContentProps={{ sx: { bgcolor: '#D6FFB7', color: 'black', fontWeight: 600, fontFamily: 'Gluten, cursive' } }}
       />
-      <Paper sx={{ maxWidth: 500, width: '100%', p: 4, borderRadius: 4 }}>
-        <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
+      
+      {/* Header avec bouton retour */}
+      <Box width="100%" maxWidth="500px" bgcolor="#232323" pt="8vw" pb="4vw" display="flex" alignItems="center" justifyContent="space-between" px="6vw">
+        <Button
+          onClick={() => navigate(-1)}
+          sx={{
+            color: '#D6FFB7',
+            fontFamily: 'Gluten, cursive',
+            fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+            textTransform: 'none',
+            '&:hover': {
+              bgcolor: 'rgba(214, 255, 183, 0.1)',
+            }
+          }}
+          startIcon={<ArrowBackIcon />}
+        >
+          Retour
+        </Button>
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            fontFamily: 'Gluten, cursive',
+            fontSize: 'clamp(1.2rem, 5vw, 1.8rem)',
+            color: '#D6FFB7',
+            fontWeight: 600,
+          }}
+        >
+          Détails du trajet
+        </Typography>
+        <Box width="80px" /> {/* Spacer pour centrer le titre */}
+      </Box>
+
+      {/* Contenu principal blanc */}
+      <Paper elevation={3} sx={{
+        width: '100%',
+        minHeight: '100vh',
+        borderTopLeftRadius: '10vw',
+        borderTopRightRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        mt: 0,
+        p: '6vw',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        fontFamily: 'Gluten, cursive',
+        boxSizing: 'border-box',
+        backgroundColor: '#fff',
+      }}>
+        {/* Photo du conducteur */}
+        <Box display="flex" flexDirection="column" alignItems="center" mb="6vw" mt="4vw">
           <Avatar
             src={conducteurPhoto}
             alt={trip.conducteur?.nom || 'Conducteur'}
-            sx={{ width: 72, height: 72, mb: 1, border: '2px solid #ccc' }}
+            sx={{ 
+              width: 'clamp(80px, 20vw, 120px)', 
+              height: 'clamp(80px, 20vw, 120px)', 
+              mb: '3vw', 
+              border: '4px solid #D6FFB7',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            }}
           />
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(1.1rem, 4vw, 1.4rem)',
+              color: '#232323',
+              fontWeight: 600,
+              textAlign: 'center'
+            }}
+          >
+            {trip.conducteur?.nom || 'Conducteur'}
+          </Typography>
         </Box>
-        <Typography variant="h4" align="center" sx={{ fontFamily: 'Pacifico, cursive', mb: 2 }}>
+
+        {/* Titre du trajet */}
+        <Typography 
+          variant="h4" 
+          align="center" 
+          sx={{ 
+            fontFamily: 'Gluten, cursive', 
+            fontSize: 'clamp(1.5rem, 8vw, 2.5rem)',
+            color: '#232323',
+            fontWeight: 700,
+            mb: '6vw',
+            textAlign: 'center'
+          }}
+        >
           {trip.ville_depart} → {trip.ville_arrivee}
         </Typography>
-        <Stack spacing={1} mb={2}>
-          <Typography><b>Date et heure :</b> {new Date(trip.date_heure_depart).toLocaleString()}</Typography>
-          <Typography><b>Prix :</b> {trip.prix !== undefined && trip.prix !== null && !isNaN(Number(trip.prix)) ? Number(trip.prix).toFixed(2) : trip.prix} €</Typography>
-          <Typography><b>Conducteur :</b> {trip.conducteur?.nom || 'N/A'}</Typography>
-          <Typography><b>Places restantes :</b> {placesRestantes > 0 ? placesRestantes : 0}</Typography>
+
+        {/* Informations du trajet */}
+        <Stack spacing={3} mb="6vw" width="100%">
+          <Box sx={{ 
+            bgcolor: '#f8f9fa', 
+            borderRadius: '15px', 
+            p: '4vw',
+            border: '2px solid #e9ecef'
+          }}>
+            <Typography sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+              color: '#666',
+              mb: '1vw'
+            }}>
+              📅 Date et heure
+            </Typography>
+            <Typography sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(1rem, 4vw, 1.3rem)',
+              color: '#232323',
+              fontWeight: 600
+            }}>
+              {new Date(trip.date_heure_depart).toLocaleString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </Typography>
+          </Box>
+
+          <Box sx={{ 
+            bgcolor: '#f8f9fa', 
+            borderRadius: '15px', 
+            p: '4vw',
+            border: '2px solid #e9ecef'
+          }}>
+            <Typography sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+              color: '#666',
+              mb: '1vw'
+            }}>
+              💰 Prix par personne
+            </Typography>
+            <Typography sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(1.2rem, 5vw, 1.8rem)',
+              color: '#232323',
+              fontWeight: 700
+            }}>
+              {trip.prix !== undefined && trip.prix !== null && !isNaN(Number(trip.prix)) ? Number(trip.prix).toFixed(2) : trip.prix} €
+            </Typography>
+          </Box>
+
+          <Box sx={{ 
+            bgcolor: '#f8f9fa', 
+            borderRadius: '15px', 
+            p: '4vw',
+            border: '2px solid #e9ecef'
+          }}>
+            <Typography sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+              color: '#666',
+              mb: '1vw'
+            }}>
+              🚗 Places disponibles
+            </Typography>
+            <Typography sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(1.2rem, 5vw, 1.8rem)',
+              color: placesRestantes > 0 ? '#28a745' : '#dc3545',
+              fontWeight: 700
+            }}>
+              {placesRestantes > 0 ? `${placesRestantes} place${placesRestantes > 1 ? 's' : ''} restante${placesRestantes > 1 ? 's' : ''}` : 'Complet'}
+            </Typography>
+          </Box>
         </Stack>
-        {userReservation ? (
-          <Alert severity="info" sx={{ mb: 2 }}>Vous avez déjà une demande de réservation en cours pour ce trajet.</Alert>
-        ) : reservationStatus && (
-          <Alert severity={reservationStatus.type} sx={{ mb: 2 }}>{reservationStatus.msg}</Alert>
+
+        {/* Alertes */}
+        {userReservation && (
+          <Alert 
+            severity="info" 
+            sx={{ 
+              mb: '4vw', 
+              width: '100%',
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+              '& .MuiAlert-message': {
+                fontFamily: 'Gluten, cursive',
+              }
+            }}
+          >
+            Vous avez déjà une demande de réservation en cours pour ce trajet.
+          </Alert>
         )}
-        {String(trip.conducteur?.id_utilisateur) === String(userId) ? (
-          <Stack spacing={1}>
-            <Button
-              variant="contained"
-              color="info"
-              fullWidth
-              onClick={() => navigate('/mes-trajets-conducteur')}
-            >
-              Gérer mon trajet
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              fullWidth
-              onClick={handleDeleteTrip}
-            >
-              Supprimer mon trajet
-            </Button>
-          </Stack>
-        ) : (
-          userReservation ? (
-            <Button
-              variant="contained"
-              color="info"
-              fullWidth
-              onClick={() => navigate('/my-trips')}
-            >
-              Voir le statut de ma réservation
-            </Button>
-          ) : reservationStatus && reservationStatus.type === "success" ? (
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              onClick={() => navigate('/my-trips')}
-            >
-              Voir mes trajets
-            </Button>
+        
+        {reservationStatus && (
+          <Alert 
+            severity={reservationStatus.type} 
+            sx={{ 
+              mb: '4vw', 
+              width: '100%',
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+              '& .MuiAlert-message': {
+                fontFamily: 'Gluten, cursive',
+              }
+            }}
+          >
+            {reservationStatus.msg}
+          </Alert>
+        )}
+
+        {/* Boutons d'action */}
+        <Stack spacing={3} width="100%">
+          {String(trip.conducteur?.id_utilisateur) === String(userId) ? (
+            <>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => navigate('/mes-trajets-conducteur')}
+                sx={{
+                  bgcolor: '#D6FFB7',
+                  color: '#232323',
+                  borderRadius: '999px',
+                  fontWeight: 'bold',
+                  py: '3vw',
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontFamily: 'Gluten, cursive',
+                  textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: '#c5e8a6',
+                  },
+                }}
+              >
+                Gérer mon trajet
+              </Button>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={handleDeleteTrip}
+                sx={{
+                  borderColor: '#ff4444',
+                  color: '#ff4444',
+                  borderRadius: '999px',
+                  fontWeight: 'bold',
+                  py: '3vw',
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontFamily: 'Gluten, cursive',
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#ff4444',
+                    bgcolor: '#ff4444',
+                    color: 'white'
+                  },
+                }}
+              >
+                Supprimer mon trajet
+              </Button>
+            </>
           ) : (
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={handleReservation}
-              disabled={resLoading}
-            >
-              {resLoading ? "Réservation..." : "Réserver ce trajet"}
-            </Button>
-          )
-        )}
+            userReservation ? (
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => navigate('/my-trips')}
+                sx={{
+                  bgcolor: '#D6FFB7',
+                  color: '#232323',
+                  borderRadius: '999px',
+                  fontWeight: 'bold',
+                  py: '3vw',
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontFamily: 'Gluten, cursive',
+                  textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: '#c5e8a6',
+                  },
+                }}
+              >
+                Voir le statut de ma réservation
+              </Button>
+            ) : reservationStatus && reservationStatus.type === "success" ? (
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => navigate('/my-trips')}
+                sx={{
+                  bgcolor: '#28a745',
+                  color: 'white',
+                  borderRadius: '999px',
+                  fontWeight: 'bold',
+                  py: '3vw',
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontFamily: 'Gluten, cursive',
+                  textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: '#218838',
+                  },
+                }}
+              >
+                Voir mes trajets
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleReservation}
+                disabled={resLoading || placesRestantes <= 0}
+                sx={{
+                  bgcolor: placesRestantes > 0 ? '#232323' : '#ccc',
+                  color: 'white',
+                  borderRadius: '999px',
+                  fontWeight: 'bold',
+                  py: '3vw',
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontFamily: 'Gluten, cursive',
+                  textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: placesRestantes > 0 ? '#111' : '#ccc',
+                  },
+                  '&:disabled': {
+                    bgcolor: '#ccc',
+                    color: '#666'
+                  }
+                }}
+              >
+                {resLoading ? "Réservation..." : placesRestantes > 0 ? "Réserver ce trajet" : "Trajet complet"}
+              </Button>
+            )
+          )}
+        </Stack>
       </Paper>
     </Box>
   );
