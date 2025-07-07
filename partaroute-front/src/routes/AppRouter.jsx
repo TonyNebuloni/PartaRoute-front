@@ -11,7 +11,6 @@ import BottomNav from "../components/BottomNav";
 import AdminPanel from "../pages/AdminPanel.jsx";
 import NotFound from "../pages/NotFound.jsx";
 import ProtectedRoute from "./ProtectedRoute";
-// import Dashboard from "../pages/Dashboard";
 
 export default function AppRouter({ onOpenCreateTrip }) {
   return (
@@ -32,8 +31,9 @@ export default function AppRouter({ onOpenCreateTrip }) {
             <MyProfile />
           </ProtectedRoute>
         } />
-        
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="*" element={<NotFound />} />
+
       </Routes>
     </BrowserRouter>
   );
