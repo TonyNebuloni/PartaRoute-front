@@ -31,7 +31,7 @@ if (!document.getElementById('google-font-gluten')) {
   document.head.appendChild(link);
 }
 
-const BACKEND_URL = "http://localhost:3000";
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", mot_de_passe: "" });
