@@ -87,23 +87,49 @@ export default function Register() {
   };
 
   return (
-    <Box minHeight="100vh" bgcolor="#232323" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" fontFamily="'Gluten', cursive">
+    <Box 
+      minHeight="100vh" 
+      bgcolor="#232323" 
+      display="flex" 
+      flexDirection="column" 
+      alignItems="center" 
+      justifyContent="flex-start" 
+      fontFamily="'Gluten', cursive"
+      sx={{
+        // Desktop: Center the form and limit width
+        justifyContent: { xs: 'flex-start', md: 'center' },
+        px: { md: 4 }
+      }}
+    >
       {/* Header noir avec logo et nom */}
-      <Box width="100%" maxWidth="500px" bgcolor="#232323" pt="8vw" pb="4vw" borderTopLeftRadius={0} borderTopRightRadius={0} display="flex" flexDirection="column" alignItems="center">
-        <Box mb="2vw" width="40vw" maxWidth="250px">
+      <Box 
+        width="100%" 
+        maxWidth={{ xs: "500px", md: "400px" }} 
+        bgcolor="#232323" 
+        pt={{ xs: "8vw", md: "2rem" }} 
+        pb={{ xs: "4vw", md: "1.5rem" }} 
+        borderTopLeftRadius={0} 
+        borderTopRightRadius={0} 
+        display="flex" 
+        flexDirection="column" 
+        alignItems="center"
+      >
+        <Box mb={{ xs: "2vw", md: "1rem" }} width={{ xs: "40vw", md: "120px" }} maxWidth="250px">
           <img src={logoIcon} alt="Logo PartaRoute" style={{ width: '100%', height: 'auto', display: 'block' }} />
         </Box>
       </Box>
+      
       {/* Formulaire blanc arrondi */}
       <Paper elevation={3} sx={{
         width: '100%',
-        minHeight: '100vh',
-        borderTopLeftRadius: '10vw',
-        borderTopRightRadius: 0,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
+        maxWidth: { xs: 'none', md: '400px' },
+        minHeight: { xs: '100vh', md: 'auto' },
+        borderTopLeftRadius: { xs: '10vw', md: '30px' },
+        borderTopRightRadius: { xs: 0, md: '30px' },
+        borderBottomLeftRadius: { xs: 0, md: '30px' },
+        borderBottomRightRadius: { xs: 0, md: '30px' },
         mt: 0,
-        p: '6vw',
+        p: { xs: '6vw', md: '2rem' },
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -115,21 +141,39 @@ export default function Register() {
           variant="h3"
           align="center"
           gutterBottom
-          sx={{ fontFamily: 'Gluten, cursive', fontSize: 'clamp(1.2rem, 7vw, 2.2rem)', mb: '6vw', mt: '2vw' }}
+          sx={{ 
+            fontFamily: 'Gluten, cursive', 
+            fontSize: { xs: 'clamp(1.2rem, 7vw, 2.2rem)', md: '1.8rem' }, 
+            mb: { xs: '6vw', md: '1.5rem' }, 
+            mt: { xs: '2vw', md: '1rem' }
+          }}
         >
-          Créer un compte
+          Inscription
+        </Typography>
+        <Typography 
+          variant="body2" 
+          align="center" 
+          sx={{ 
+            color: 'grey.600', 
+            mb: { xs: '4vw', md: '2rem' }, 
+            fontFamily: 'Gluten, cursive', 
+            fontSize: { xs: 'clamp(0.9rem, 3vw, 1.1rem)', md: '1rem' }
+          }}
+        >
+          Crée ton compte gratuitement
         </Typography>
         {error && (
-          <Typography color="error" align="center" variant="body2" sx={{ mb: '4vw' }}>
+          <Typography color="error" align="center" variant="body2" sx={{ mb: { xs: '4vw', md: '1.5rem' } }}>
             {error}
           </Typography>
         )}
         <Box component="form" onSubmit={handleSubmit} width="100%" noValidate>
-          <Stack spacing={3}>
+          <Stack spacing={{ xs: 3, md: 2 }}>
             <TextField
-              label="Prénom"
+              label="Nom"
               name="nom"
-              placeholder="Joe Doe"
+              type="text"
+              placeholder="Doe"
               value={formData.nom}
               onChange={handleChange}
               fullWidth
@@ -138,35 +182,31 @@ export default function Register() {
               InputProps={{ 
                 sx: { 
                   fontFamily: 'Gluten, cursive', 
-                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontSize: { xs: 'clamp(1rem, 4vw, 1.2rem)', md: '1rem' },
                   paddingLeft: '16px',
                   paddingRight: '8px',
                   paddingY: '4px',
                   '&:before': {
                     borderBottomColor: '#000',
                     borderBottomWidth: '2px',
-                    
                   },
                   '&:after': {
                     borderBottomColor: '#D6FFB7',
                     borderBottomWidth: '2px',
-                    
                     borderImage: 'linear-gradient(to right, #D6FFB7, #D6FFB7) 1',
                   },
                   '&:hover:not(.Mui-disabled):before': {
                     borderBottomColor: '#000',
-                    
                   },
                   '&.Mui-focused:after': {
                     borderBottomColor: '#D6FFB7',
-                    
                   },
                 } 
               }}
               InputLabelProps={{ 
                 sx: { 
                   fontFamily: 'Gluten, cursive', 
-                  fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                  fontSize: { xs: 'clamp(0.9rem, 3vw, 1.1rem)', md: '0.9rem' },
                   color: '#000',
                   paddingLeft: '16px',
                   '&.Mui-focused': {
@@ -188,35 +228,31 @@ export default function Register() {
               InputProps={{ 
                 sx: { 
                   fontFamily: 'Gluten, cursive', 
-                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontSize: { xs: 'clamp(1rem, 4vw, 1.2rem)', md: '1rem' },
                   paddingLeft: '16px',
                   paddingRight: '8px',
                   paddingY: '4px',
                   '&:before': {
                     borderBottomColor: '#000',
                     borderBottomWidth: '2px',
-                    
                   },
                   '&:after': {
                     borderBottomColor: '#D6FFB7',
                     borderBottomWidth: '2px',
-                    
                     borderImage: 'linear-gradient(to right, #D6FFB7, #D6FFB7) 1',
                   },
                   '&:hover:not(.Mui-disabled):before': {
                     borderBottomColor: '#000',
-                    
                   },
                   '&.Mui-focused:after': {
                     borderBottomColor: '#D6FFB7',
-                    
                   },
                 } 
               }}
               InputLabelProps={{ 
                 sx: { 
                   fontFamily: 'Gluten, cursive', 
-                  fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                  fontSize: { xs: 'clamp(0.9rem, 3vw, 1.1rem)', md: '0.9rem' },
                   color: '#000',
                   paddingLeft: '16px',
                   '&.Mui-focused': {
@@ -238,35 +274,31 @@ export default function Register() {
               InputProps={{ 
                 sx: { 
                   fontFamily: 'Gluten, cursive', 
-                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                  fontSize: { xs: 'clamp(1rem, 4vw, 1.2rem)', md: '1rem' },
                   paddingLeft: '16px',
                   paddingRight: '8px',
                   paddingY: '4px',
                   '&:before': {
                     borderBottomColor: '#000',
                     borderBottomWidth: '2px',
-                    
                   },
                   '&:after': {
                     borderBottomColor: '#D6FFB7',
                     borderBottomWidth: '2px',
-                    
                     borderImage: 'linear-gradient(to right, #D6FFB7, #D6FFB7) 1',
                   },
                   '&:hover:not(.Mui-disabled):before': {
                     borderBottomColor: '#000',
-                    
                   },
                   '&.Mui-focused:after': {
                     borderBottomColor: '#D6FFB7',
-                    
                   },
                 } 
               }}
               InputLabelProps={{ 
                 sx: { 
                   fontFamily: 'Gluten, cursive', 
-                  fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                  fontSize: { xs: 'clamp(0.9rem, 3vw, 1.1rem)', md: '0.9rem' },
                   color: '#000',
                   paddingLeft: '16px',
                   '&.Mui-focused': {
@@ -280,17 +312,17 @@ export default function Register() {
               variant="contained"
               fullWidth
               sx={{
-                mt: '2vw',
+                mt: { xs: '2vw', md: '1.5rem' },
                 bgcolor: '#232323',
                 color: 'white',
                 borderRadius: '999px',
                 fontWeight: 'bold',
-                fontSize: 'clamp(0.8rem, 3.5vw, 1rem)',
+                fontSize: { xs: 'clamp(0.9rem, 4vw, 1.1rem)', md: '1rem' },
                 fontFamily: 'Gluten, cursive',
-                py: '2.5vw',
-                px: '8vw',
-                maxWidth: '300px',
-                width: '80%',
+                py: { xs: '2.5vw', md: '0.8rem' },
+                px: { xs: '8vw', md: '2rem' },
+                maxWidth: { xs: '300px', md: 'none' },
+                width: { xs: '80%', md: '100%' },
                 alignSelf: 'center',
                 whiteSpace: 'nowrap',
                 '&:hover': {
@@ -302,7 +334,16 @@ export default function Register() {
             </Button>
           </Stack>
         </Box>
-        <Typography variant="body2" align="center" sx={{ mt: '6vw', color: 'grey.800', fontFamily: 'Gluten, cursive', fontSize: 'clamp(0.9rem, 3vw, 1.1rem)' }}>
+        <Typography 
+          variant="body2" 
+          align="center" 
+          sx={{ 
+            mt: { xs: '6vw', md: '2rem' }, 
+            color: 'grey.800', 
+            fontFamily: 'Gluten, cursive', 
+            fontSize: { xs: 'clamp(0.9rem, 3vw, 1.1rem)', md: '0.9rem' }
+          }}
+        >
           Déjà un compte ?{' '}
           <Link to="/login" style={{ fontWeight: 'bold', color: 'inherit', textDecoration: 'none' }}>Se connecter</Link>
         </Typography>

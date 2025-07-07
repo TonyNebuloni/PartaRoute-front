@@ -85,15 +85,15 @@ export default function AdminDashboard({ onNavigate }) {
   return (
     <Box sx={{ pb: { xs: 4, sm: 6, md: 8 } }}>
       {/* Titre du dashboard */}
-      <Box mb="6vw" textAlign="center">
+      <Box mb={{ xs: "6vw", md: "3rem" }} textAlign="center">
         <Typography 
           variant="h4" 
           sx={{ 
             fontFamily: 'Gluten, cursive', 
-            fontSize: 'clamp(1.5rem, 7vw, 2.2rem)',
+            fontSize: { xs: 'clamp(1.5rem, 7vw, 2.2rem)', md: '2.5rem' },
             color: '#232323',
             fontWeight: 700,
-            mb: '2vw'
+            mb: { xs: '2vw', md: '1rem' }
           }}
         >
           📊 Dashboard Administrateur
@@ -101,7 +101,7 @@ export default function AdminDashboard({ onNavigate }) {
         <Typography 
           sx={{ 
             fontFamily: 'Gluten, cursive',
-            fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+            fontSize: { xs: 'clamp(0.9rem, 3vw, 1.1rem)', md: '1.2rem' },
             color: '#666'
           }}
         >
@@ -113,11 +113,17 @@ export default function AdminDashboard({ onNavigate }) {
       <Box 
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gridTemplateRows: 'repeat(2, 1fr)',
+          gridTemplateColumns: { 
+            xs: 'repeat(2, 1fr)', 
+            md: 'repeat(4, 1fr)' 
+          },
+          gridTemplateRows: { 
+            xs: 'repeat(2, 1fr)', 
+            md: '1fr' 
+          },
           gap: { xs: 2, sm: 3, md: 4 },
-          mb: '8vw',
-          maxWidth: { xs: '100%', sm: '600px', md: '800px' },
+          mb: { xs: '8vw', md: '4rem' },
+          maxWidth: { xs: '100%', sm: '600px', md: '100%' },
           margin: '0 auto'
         }}
       >
@@ -193,8 +199,8 @@ export default function AdminDashboard({ onNavigate }) {
       </Box>
 
       {/* Section d'informations supplémentaires */}
-      <Box mt="8vw">
-        <Grid container spacing={4}>
+      <Box mt={{ xs: "8vw", md: "4rem" }}>
+        <Grid container spacing={{ xs: 4, md: 6 }}>
           <Grid item xs={12} md={6}>
             <Card 
               elevation={2}
@@ -204,23 +210,23 @@ export default function AdminDashboard({ onNavigate }) {
                 height: '100%'
               }}
             >
-              <CardContent sx={{ p: '6vw' }}>
+              <CardContent sx={{ p: { xs: '6vw', md: '2rem' } }}>
                 <Typography sx={{ 
                   fontFamily: 'Gluten, cursive',
-                  fontSize: 'clamp(1.2rem, 5vw, 1.5rem)',
+                  fontSize: { xs: 'clamp(1.2rem, 5vw, 1.5rem)', md: '1.8rem' },
                   color: '#232323',
                   fontWeight: 700,
-                  mb: '4vw',
+                  mb: { xs: '4vw', md: '2rem' },
                   textAlign: 'center'
                 }}>
                   🎯 Actions rapides
                 </Typography>
                 
-                <Stack spacing={3}>
+                <Stack spacing={{ xs: 3, md: 4 }}>
                   <Box sx={{ 
                     bgcolor: '#f8f9fa', 
                     borderRadius: '12px', 
-                    p: '4vw',
+                    p: { xs: '4vw', md: '1.5rem' },
                     border: '1px solid #e9ecef',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
@@ -235,7 +241,7 @@ export default function AdminDashboard({ onNavigate }) {
                   >
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+                      fontSize: { xs: 'clamp(0.9rem, 3.5vw, 1.1rem)', md: '1.2rem' },
                       color: '#232323',
                       fontWeight: 600
                     }}>
@@ -243,7 +249,7 @@ export default function AdminDashboard({ onNavigate }) {
                     </Typography>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                      fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '1rem' },
                       color: '#666'
                     }}>
                       Promouvoir, modifier ou supprimer des comptes
@@ -253,7 +259,7 @@ export default function AdminDashboard({ onNavigate }) {
                   <Box sx={{ 
                     bgcolor: '#f8f9fa', 
                     borderRadius: '12px', 
-                    p: '4vw',
+                    p: { xs: '4vw', md: '1.5rem' },
                     border: '1px solid #e9ecef',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
@@ -268,7 +274,7 @@ export default function AdminDashboard({ onNavigate }) {
                   >
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+                      fontSize: { xs: 'clamp(0.9rem, 3.5vw, 1.1rem)', md: '1.2rem' },
                       color: '#232323',
                       fontWeight: 600
                     }}>
@@ -276,7 +282,7 @@ export default function AdminDashboard({ onNavigate }) {
                     </Typography>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                      fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '1rem' },
                       color: '#666'
                     }}>
                       Modérer et gérer les trajets publiés
@@ -286,7 +292,7 @@ export default function AdminDashboard({ onNavigate }) {
                   <Box sx={{ 
                     bgcolor: '#f8f9fa', 
                     borderRadius: '12px', 
-                    p: '4vw',
+                    p: { xs: '4vw', md: '1.5rem' },
                     border: '1px solid #e9ecef',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
@@ -301,7 +307,7 @@ export default function AdminDashboard({ onNavigate }) {
                   >
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+                      fontSize: { xs: 'clamp(0.9rem, 3.5vw, 1.1rem)', md: '1.2rem' },
                       color: '#232323',
                       fontWeight: 600
                     }}>
@@ -309,7 +315,7 @@ export default function AdminDashboard({ onNavigate }) {
                     </Typography>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                      fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '1rem' },
                       color: '#666'
                     }}>
                       Résoudre les conflits et annuler si nécessaire
@@ -329,28 +335,28 @@ export default function AdminDashboard({ onNavigate }) {
                 height: '100%'
               }}
             >
-              <CardContent sx={{ p: '6vw' }}>
+              <CardContent sx={{ p: { xs: '6vw', md: '2rem' } }}>
                 <Typography sx={{ 
                   fontFamily: 'Gluten, cursive',
-                  fontSize: 'clamp(1.2rem, 5vw, 1.5rem)',
+                  fontSize: { xs: 'clamp(1.2rem, 5vw, 1.5rem)', md: '1.8rem' },
                   color: '#232323',
                   fontWeight: 700,
-                  mb: '4vw',
+                  mb: { xs: '4vw', md: '2rem' },
                   textAlign: 'center'
                 }}>
                   📈 Statut de la plateforme
                 </Typography>
                 
-                <Stack spacing={3}>
+                <Stack spacing={{ xs: 3, md: 4 }}>
                   <Box sx={{ 
                     bgcolor: '#e8f5e8', 
                     borderRadius: '12px', 
-                    p: '4vw',
+                    p: { xs: '4vw', md: '1.5rem' },
                     border: '2px solid #4caf50'
                   }}>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+                      fontSize: { xs: 'clamp(0.9rem, 3.5vw, 1.1rem)', md: '1.2rem' },
                       color: '#4caf50',
                       fontWeight: 700,
                       textAlign: 'center'
@@ -362,21 +368,21 @@ export default function AdminDashboard({ onNavigate }) {
                   <Box sx={{ 
                     bgcolor: '#fff3e0', 
                     borderRadius: '12px', 
-                    p: '4vw',
+                    p: { xs: '4vw', md: '1.5rem' },
                     border: '1px solid #ff9800'
                   }}>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                      fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '1.1rem' },
                       color: '#ff9800',
                       fontWeight: 600,
-                      mb: '1vw'
+                      mb: { xs: '1vw', md: '0.5rem' }
                     }}>
                       📊 Activité récente
                     </Typography>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                      fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '1rem' },
                       color: '#666'
                     }}>
                       {stats?.totalTrips > 0 ? 
@@ -389,21 +395,21 @@ export default function AdminDashboard({ onNavigate }) {
                   <Box sx={{ 
                     bgcolor: '#e3f2fd', 
                     borderRadius: '12px', 
-                    p: '4vw',
+                    p: { xs: '4vw', md: '1.5rem' },
                     border: '1px solid #2196f3'
                   }}>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                      fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '1.1rem' },
                       color: '#2196f3',
                       fontWeight: 600,
-                      mb: '1vw'
+                      mb: { xs: '1vw', md: '0.5rem' }
                     }}>
                       🛡️ Sécurité
                     </Typography>
                     <Typography sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                      fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '1rem' },
                       color: '#666'
                     }}>
                       {stats?.totalAdmins} administrateur{stats?.totalAdmins > 1 ? 's' : ''} actif{stats?.totalAdmins > 1 ? 's' : ''}

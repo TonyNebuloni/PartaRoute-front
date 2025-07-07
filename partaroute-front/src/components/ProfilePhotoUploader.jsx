@@ -5,7 +5,7 @@ import { Box, Button, Avatar, Typography, CircularProgress, Snackbar, Alert, Sta
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 const DEFAULT_PHOTO = `${BACKEND_URL}/uploads/profile_photos/default.png`;
 
-export default function ProfilePhotoUploader({ onPhotoChange }) {
+export default function ProfilePhotoUploader({ onPhotoChange, textColor = "text.primary" }) {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
@@ -68,7 +68,7 @@ export default function ProfilePhotoUploader({ onPhotoChange }) {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" gap={2} mb={2}>
-      <Typography variant="subtitle1" gutterBottom>Photo de profil</Typography>
+      <Typography variant="subtitle1" gutterBottom sx={{ color: textColor, fontFamily: 'Gluten, cursive' }}>Photo de profil</Typography>
       <Avatar
         src={preview || photoUrl || DEFAULT_PHOTO}
         alt="Photo de profil"

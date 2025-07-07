@@ -244,26 +244,26 @@ export default function Home() {
           bgcolor: '#232323', 
           color: 'white',
           position: 'relative',
-          pb: '20vw', // Plus haut pour que la carte soit bien entre gris et blanc
+          pb: { xs: '20vw', md: '80px' },
           borderBottomLeftRadius: '30px',
           borderBottomRightRadius: '30px',
         }}
       >
         {/* Header avec salutation et icône admin */}
-        <Box sx={{ p: '6vw', pt: '12vw', position: 'relative' }}>
+        <Box sx={{ p: { xs: '6vw', md: '2rem 4rem' }, pt: { xs: '12vw', md: '2.5rem' }, position: 'relative' }}>
           {/* Icône admin en haut à droite */}
           {isAdmin && (
             <IconButton
               onClick={() => navigate('/admin')}
               sx={{
                 position: 'absolute',
-                top: '6vw',
-                right: '6vw',
+                top: { xs: '6vw', md: '1.5rem' },
+                right: { xs: '6vw', md: '4rem' },
                 bgcolor: 'rgba(214, 255, 183, 0.1)',
                 color: '#D6FFB7',
                 border: '2px solid #D6FFB7',
-                width: 'clamp(40px, 10vw, 50px)',
-                height: 'clamp(40px, 10vw, 50px)',
+                width: { xs: 'clamp(40px, 10vw, 50px)', md: '48px' },
+                height: { xs: 'clamp(40px, 10vw, 50px)', md: '48px' },
                 '&:hover': {
                   bgcolor: '#D6FFB7',
                   color: '#232323',
@@ -272,7 +272,7 @@ export default function Home() {
                 },
               }}
             >
-              <AdminPanelSettingsIcon sx={{ fontSize: 'clamp(20px, 5vw, 24px)' }} />
+              <AdminPanelSettingsIcon sx={{ fontSize: { xs: 'clamp(20px, 5vw, 24px)', md: '24px' } }} />
             </IconButton>
           )}
           
@@ -280,11 +280,11 @@ export default function Home() {
             variant="h4" 
             sx={{ 
               fontFamily: 'Gluten, cursive',
-              fontSize: 'clamp(1.5rem, 8vw, 2.5rem)',
+              fontSize: { xs: 'clamp(1.5rem, 8vw, 2.5rem)', md: '2rem' },
               fontWeight: 400,
-              mb: '2vw',
+              mb: { xs: '2vw', md: '0.5rem' },
               color: '#D6FFB7',
-              pr: isAdmin ? '15vw' : 0 // Ajouter du padding à droite si admin pour éviter le chevauchement
+              pr: { xs: isAdmin ? '15vw' : 0, md: isAdmin ? '60px' : 0 }
             }}
           >
             Salut, {prenom || userName || 'Utilisateur'}
@@ -293,10 +293,10 @@ export default function Home() {
             variant="h5" 
             sx={{ 
               fontFamily: 'Gluten, cursive',
-              fontSize: 'clamp(1.2rem, 6vw, 2rem)',
+              fontSize: { xs: 'clamp(1.2rem, 6vw, 2rem)', md: '1.4rem' },
               fontWeight: 400,
               color: 'white',
-              mb: '8vw'
+              mb: { xs: '8vw', md: '2rem' }
             }}
           >
             Où voudrait tu aller aujourd'hui ?
@@ -305,9 +305,9 @@ export default function Home() {
 
         {/* Section de recherche avec image - positionnée absolument pour chevaucher */}
         <Box sx={{ 
-          px: '6vw', 
+          px: { xs: '6vw', md: '4rem' }, 
           position: 'absolute', 
-          bottom: '-100px', // Positionne la carte pour qu'elle chevauche
+          bottom: { xs: '-100px', md: '-80px' },
           left: 0,
           right: 0,
           zIndex: 10 
@@ -317,10 +317,12 @@ export default function Home() {
               borderRadius: '20px',
               overflow: 'hidden',
               position: 'relative',
-              height: '200px',
+              height: { xs: '200px', md: '180px' },
               backgroundImage: `url(${imgCannes})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
+              maxWidth: { md: '1000px' },
+              margin: { md: '0 auto' }
             }}
           >
             <Box 
@@ -331,10 +333,10 @@ export default function Home() {
                 right: 0,
                 bottom: 0,
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
-                display: 'flex',
-                flexDirection: 'column',
+        display: 'flex',
+        flexDirection: 'column',
                 justifyContent: 'space-between',
-                p: '5vw',
+                p: { xs: '5vw', md: '2rem' },
               }}
             >
               {/* Header de la carte */}
@@ -343,10 +345,10 @@ export default function Home() {
                   <Typography 
                     sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                      fontSize: { xs: 'clamp(0.9rem, 4vw, 1.1rem)', md: '1rem' },
                       color: 'white',
                       opacity: 0.9,
-                      mb: '1vw'
+                      mb: { xs: '1vw', md: '0.5rem' }
                     }}
                   >
                     Co-voiturage le plus proche
@@ -354,7 +356,7 @@ export default function Home() {
                   <Typography 
                     sx={{ 
                       fontFamily: 'Gluten, cursive',
-                      fontSize: 'clamp(1.5rem, 7vw, 2.2rem)',
+                      fontSize: { xs: 'clamp(1.5rem, 7vw, 2.2rem)', md: '2rem' },
                       color: 'white',
                       fontWeight: 600,
                     }}
@@ -368,14 +370,14 @@ export default function Home() {
                     bgcolor: 'rgba(255,255,255,0.9)',
                     color: '#222',
                     borderRadius: '20px',
-                    px: '4vw',
-                    py: '1vw',
-                    fontSize: 'clamp(0.6rem, 2vw, 0.75rem)',
+                    px: { xs: '4vw', md: '1.5rem' },
+                    py: { xs: '1vw', md: '0.6rem' },
+                    fontSize: { xs: 'clamp(0.6rem, 2vw, 0.75rem)', md: '0.9rem' },
                     fontFamily: 'Gluten, cursive',
                     fontWeight: 500,
                     textTransform: 'none',
-                    minWidth: '120px',
-                    height: '30px',
+                    minWidth: { xs: '120px', md: '140px' },
+                    height: { xs: '30px', md: '36px' },
                     whiteSpace: 'nowrap',
                     '&:hover': {
                       bgcolor: 'rgba(255,255,255,1)',
@@ -387,24 +389,24 @@ export default function Home() {
               </Box>
 
               {/* Champs de recherche fonctionnels */}
-              <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: '3vw' }}>
+              <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: { xs: '3vw', md: '1.5rem' } }}>
                 <Box 
                   sx={{
                     flex: 1,
                     bgcolor: 'rgba(255,255,255,0.95)',
                     borderRadius: '15px',
-                    p: '2vw',
+                    p: { xs: '2vw', md: '1rem' },
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '1.5vw',
+                    gap: { xs: '1.5vw', md: '1rem' },
                     cursor: 'pointer'
                   }}
                   onClick={() => document.getElementById('ville-depart').focus()}
                 >
                   <Box 
                     sx={{
-                      width: '5vw',
-                      height: '5vw',
+                      width: { xs: '5vw', md: '28px' },
+                      height: { xs: '5vw', md: '28px' },
                       bgcolor: '#232323',
                       borderRadius: '50%',
                       display: 'flex',
@@ -412,11 +414,11 @@ export default function Home() {
                       justifyContent: 'center',
                       minWidth: '20px',
                       minHeight: '20px',
-                      maxWidth: '24px',
-                      maxHeight: '24px',
+                      maxWidth: { xs: '24px', md: '28px' },
+                      maxHeight: { xs: '24px', md: '28px' },
                     }}
                   >
-                    <Typography sx={{ color: 'white', fontSize: 'clamp(0.6rem, 2vw, 0.8rem)', fontWeight: 'bold' }}>A</Typography>
+                    <Typography sx={{ color: 'white', fontSize: { xs: 'clamp(0.6rem, 2vw, 0.8rem)', md: '0.9rem' }, fontWeight: 'bold' }}>A</Typography>
                   </Box>
                   <TextField
                     id="ville-depart"
@@ -430,7 +432,7 @@ export default function Home() {
                       '& .MuiInput-underline:after': { display: 'none' },
                       '& .MuiInputBase-input': {
                         fontFamily: 'Gluten, cursive',
-                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                        fontSize: { xs: 'clamp(0.7rem, 3vw, 0.9rem)', md: '1rem' },
                         color: '#222',
                         fontWeight: 500,
                         padding: 0,
@@ -442,7 +444,7 @@ export default function Home() {
                         fontFamily: 'Gluten, cursive',
                         color: '#222',
                         opacity: 1,
-                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                        fontSize: { xs: 'clamp(0.7rem, 3vw, 0.9rem)', md: '1rem' },
                       }
                     }}
                   />
@@ -452,18 +454,18 @@ export default function Home() {
                     flex: 1,
                     bgcolor: 'rgba(255,255,255,0.95)',
                     borderRadius: '15px',
-                    p: '2vw',
+                    p: { xs: '2vw', md: '1rem' },
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '1.5vw',
+                    gap: { xs: '1.5vw', md: '1rem' },
                     cursor: 'pointer'
                   }}
                   onClick={() => document.getElementById('ville-arrivee').focus()}
                 >
                   <Box 
                     sx={{
-                      width: '5vw',
-                      height: '5vw',
+                      width: { xs: '5vw', md: '28px' },
+                      height: { xs: '5vw', md: '28px' },
                       bgcolor: '#232323',
                       borderRadius: '50%',
                       display: 'flex',
@@ -471,11 +473,11 @@ export default function Home() {
                       justifyContent: 'center',
                       minWidth: '20px',
                       minHeight: '20px',
-                      maxWidth: '24px',
-                      maxHeight: '24px',
+                      maxWidth: { xs: '24px', md: '28px' },
+                      maxHeight: { xs: '24px', md: '28px' },
                     }}
                   >
-                    <Typography sx={{ color: 'white', fontSize: 'clamp(0.6rem, 2vw, 0.8rem)', fontWeight: 'bold' }}>B</Typography>
+                    <Typography sx={{ color: 'white', fontSize: { xs: 'clamp(0.6rem, 2vw, 0.8rem)', md: '0.9rem' }, fontWeight: 'bold' }}>B</Typography>
                   </Box>
                   <TextField
                     id="ville-arrivee"
@@ -489,7 +491,7 @@ export default function Home() {
                       '& .MuiInput-underline:after': { display: 'none' },
                       '& .MuiInputBase-input': {
                         fontFamily: 'Gluten, cursive',
-                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                        fontSize: { xs: 'clamp(0.7rem, 3vw, 0.9rem)', md: '1rem' },
                         color: '#222',
                         fontWeight: 500,
                         padding: 0,
@@ -501,7 +503,7 @@ export default function Home() {
                         fontFamily: 'Gluten, cursive',
                         color: '#222',
                         opacity: 1,
-                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                        fontSize: { xs: 'clamp(0.7rem, 3vw, 0.9rem)', md: '1rem' },
                       }
                     }}
                   />
@@ -515,18 +517,21 @@ export default function Home() {
       {/* Section inférieure blanche */}
       <Box sx={{ 
         bgcolor: 'white', 
-        pt: '120px', 
-        px: '6vw',
-        pb: { xs: 8, sm: 10, md: 12 } // Ajout de marge en bas pour le scroll
+        pt: { xs: '120px', md: '100px' }, 
+        px: { xs: '6vw', md: '4rem' },
+        pb: { xs: 8, sm: 10, md: 12 }
       }}>
         <Typography 
           variant="h6" 
           sx={{ 
             fontFamily: 'Gluten, cursive',
-            fontSize: 'clamp(1.1rem, 5vw, 1.5rem)',
+            fontSize: { xs: 'clamp(1.1rem, 5vw, 1.5rem)', md: '1.3rem' },
             fontWeight: 600,
             color: '#222',
-            mb: '4vw'
+            mb: { xs: '4vw', md: '1.5rem' },
+            maxWidth: { md: '1000px' },
+            margin: { md: '0 auto' },
+            marginBottom: { xs: '4vw', md: '1.5rem' }
           }}
         >
           Trajets disponible aujourd'hui :
@@ -577,16 +582,22 @@ export default function Home() {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             sx={{
-              display: 'flex',
-              gap: '4vw',
-              overflowX: 'auto',
+              // Mobile: scroll horizontal
+              display: { xs: 'flex', md: 'grid' },
+              gridTemplateColumns: { md: 'repeat(5, 1fr)' },
+              gap: { xs: '4vw', md: '1.5rem' },
+              overflowX: { xs: 'auto', md: 'visible' },
               scrollBehavior: 'smooth',
-              pb: '2vw',
-              mb: { xs: 4, sm: 6, md: 8 }, // Marge supplémentaire en bas
+              pb: { xs: '2vw', md: '1rem' },
+              mb: { xs: 4, sm: 6, md: 8 },
+              maxWidth: { xs: 'none', md: '100%' },
+              margin: { md: '0' },
+              marginBottom: { xs: 4, sm: 6, md: 8 },
+              px: { md: 0 },
               '&::-webkit-scrollbar': {
-                display: 'none',
+                display: { xs: 'none', md: 'auto' },
               },
-              scrollbarWidth: 'none',
+              scrollbarWidth: { xs: 'none', md: 'auto' },
             }}
           >
             {(() => {
@@ -645,13 +656,13 @@ export default function Home() {
                 <Card 
                   key={trip.id_trajet}
                   sx={{
-                    minWidth: '280px',
-                    width: '70vw',
-                    maxWidth: '320px',
+                    minWidth: { xs: '280px', md: 'auto' },
+                    width: { xs: '70vw', md: '100%' },
+                    maxWidth: { xs: '320px', md: 'none' },
                     borderRadius: '20px',
                     overflow: 'hidden',
                     position: 'relative',
-                    height: '350px',
+                    height: { xs: '350px', md: '300px' },
                     cursor: 'pointer',
                     transition: 'transform 0.2s',
                     '&:hover': {
@@ -692,10 +703,10 @@ export default function Home() {
                         right: '15px',
                         bgcolor: '#ff4444',
                         color: 'white',
-                        px: '8px',
-                        py: '4px',
+                        px: { xs: '8px', md: '10px' },
+                        py: { xs: '4px', md: '5px' },
                         borderRadius: '12px',
-                        fontSize: 'clamp(0.6rem, 2.5vw, 0.8rem)',
+                        fontSize: { xs: 'clamp(0.6rem, 2.5vw, 0.8rem)', md: '0.8rem' },
                         fontFamily: 'Gluten, cursive',
                         fontWeight: 600,
                         textTransform: 'uppercase',
@@ -715,25 +726,25 @@ export default function Home() {
                       left: 0,
                       right: 0,
                       color: 'white',
-                      p: '5vw',
+                      p: { xs: '5vw', md: '1rem' },
                     }}
                   >
                     <Typography 
                       sx={{ 
                         fontFamily: 'Gluten, cursive',
-                        fontSize: 'clamp(1.2rem, 6vw, 1.8rem)',
+                        fontSize: { xs: 'clamp(1.2rem, 6vw, 1.8rem)', md: '1.1rem' },
                         fontWeight: 600,
-                        mb: '2vw'
+                        mb: { xs: '2vw', md: '0.8rem' }
                       }}
                     >
                       {trip.ville_depart} → {trip.ville_arrivee}
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '1vw' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: '1vw', md: '0.3rem' } }}>
                         <Typography 
                           sx={{ 
                             fontFamily: 'Gluten, cursive',
-                            fontSize: 'clamp(1rem, 5vw, 1.4rem)',
+                            fontSize: { xs: 'clamp(1rem, 5vw, 1.4rem)', md: '1.1rem' },
                             fontWeight: 600,
                           }}
                         >
@@ -742,7 +753,7 @@ export default function Home() {
                         <Typography 
                           sx={{ 
                             fontFamily: 'Gluten, cursive',
-                            fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                            fontSize: { xs: 'clamp(0.8rem, 3vw, 1rem)', md: '0.9rem' },
                             opacity: 0.8,
                           }}
                         >
@@ -753,7 +764,7 @@ export default function Home() {
                         <Typography 
                           sx={{ 
                             fontFamily: 'Gluten, cursive',
-                            fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                            fontSize: { xs: 'clamp(0.9rem, 4vw, 1.1rem)', md: '0.8rem' },
                             opacity: 0.9,
                             textDecoration: 'underline',
                           }}
@@ -764,9 +775,9 @@ export default function Home() {
                           <Typography 
                             sx={{ 
                               fontFamily: 'Gluten, cursive',
-                              fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                              fontSize: { xs: 'clamp(0.7rem, 3vw, 0.9rem)', md: '0.7rem' },
                               opacity: 0.8,
-                              mt: '0.5vw',
+                              mt: { xs: '0.5vw', md: '0.2rem' },
                             }}
                           >
                             {trip.places_disponibles} place{trip.places_disponibles > 1 ? 's' : ''} restante{trip.places_disponibles > 1 ? 's' : ''}
