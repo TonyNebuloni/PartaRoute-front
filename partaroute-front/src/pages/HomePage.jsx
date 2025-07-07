@@ -6,7 +6,7 @@ import TripCardList from "../components/TripCardList";
 import TripForm from "../components/TripForm";
 import CloseIcon from "@mui/icons-material/Close";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import PaginationMUI from '../components/PaginationMUI';
+import CustomPagination from '../components/CustomPagination';
 import imgCannes from '../assets/img_cannes.jpg';
 import imgAntibes from '../assets/img_antibes.jpg';
 
@@ -790,6 +790,17 @@ export default function Home() {
               ));
             })()}
           </Box>
+        )}
+
+        {/* Pagination custom sous la liste des trajets */}
+        {!loading && !error && total > 0 && (
+          <CustomPagination
+            page={page}
+            count={Math.max(1, Math.ceil(total / limit))}
+            onChange={setPage}
+            limit={limit}
+            onLimitChange={handleLimitChange}
+          />
         )}
       </Box>
 
