@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import TripCardList from "../components/TripCardList";
 import TripForm from "../components/TripForm";
 import CloseIcon from "@mui/icons-material/Close";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import PaginationMUI from '../components/PaginationMUI';
 import imgCannes from '../assets/img_cannes.jpg';
 import imgAntibes from '../assets/img_antibes.jpg';
@@ -48,6 +49,7 @@ export default function Home() {
   const [cityDialogOpen, setCityDialogOpen] = useState(false);
   const [availableCities, setAvailableCities] = useState([]);
   const [searchTimeout, setSearchTimeout] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
@@ -121,8 +123,12 @@ export default function Home() {
     // Fetch user uniquement si connecté
     const token = localStorage.getItem("accessToken");
     const id = localStorage.getItem("userId");
+    const userRole = localStorage.getItem("userRole");
+    
     if (token && id) {
       setIsConnected(true);
+      setIsAdmin(userRole === 'admin');
+      
       axios
         .get(`${BACKEND_URL}/api/user/${id}`, {
           headers: {
@@ -137,6 +143,7 @@ export default function Home() {
         });
     } else {
       setIsConnected(false);
+      setIsAdmin(false);
     }
 
     // Récupérer le nom de l'utilisateur depuis le localStorage ou l'API
@@ -230,21 +237,45 @@ export default function Home() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', pb: '100px' }}>
-      {/* Section supérieure grise */}
+    <Box sx={{ minHeight: '100vh', bgcolor: '#fff', fontFamily: 'Gluten, cursive' }}>
+      {/* Section grise du haut */}
       <Box 
-        sx={{
-          bgcolor: '#232323',
+        sx={{ 
+          bgcolor: '#232323', 
           color: 'white',
-          fontFamily: 'Gluten, cursive',
           position: 'relative',
           pb: '20vw', // Plus haut pour que la carte soit bien entre gris et blanc
           borderBottomLeftRadius: '30px',
           borderBottomRightRadius: '30px',
         }}
       >
-        {/* Header avec salutation */}
-        <Box sx={{ p: '6vw', pt: '12vw' }}>
+        {/* Header avec salutation et icône admin */}
+        <Box sx={{ p: '6vw', pt: '12vw', position: 'relative' }}>
+          {/* Icône admin en haut à droite */}
+          {isAdmin && (
+            <IconButton
+              onClick={() => navigate('/admin')}
+              sx={{
+                position: 'absolute',
+                top: '6vw',
+                right: '6vw',
+                bgcolor: 'rgba(214, 255, 183, 0.1)',
+                color: '#D6FFB7',
+                border: '2px solid #D6FFB7',
+                width: 'clamp(40px, 10vw, 50px)',
+                height: 'clamp(40px, 10vw, 50px)',
+                '&:hover': {
+                  bgcolor: '#D6FFB7',
+                  color: '#232323',
+                  transform: 'scale(1.05)',
+                  transition: 'all 0.3s ease'
+                },
+              }}
+            >
+              <AdminPanelSettingsIcon sx={{ fontSize: 'clamp(20px, 5vw, 24px)' }} />
+            </IconButton>
+          )}
+          
           <Typography 
             variant="h4" 
             sx={{ 
@@ -252,7 +283,8 @@ export default function Home() {
               fontSize: 'clamp(1.5rem, 8vw, 2.5rem)',
               fontWeight: 400,
               mb: '2vw',
-              color: '#D6FFB7'
+              color: '#D6FFB7',
+              pr: isAdmin ? '15vw' : 0 // Ajouter du padding à droite si admin pour éviter le chevauchement
             }}
           >
             Salut, {prenom || userName || 'Utilisateur'}
@@ -481,7 +513,12 @@ export default function Home() {
       </Box>
 
       {/* Section inférieure blanche */}
-      <Box sx={{ bgcolor: 'white', pt: '120px', px: '6vw' }}>
+      <Box sx={{ 
+        bgcolor: 'white', 
+        pt: '120px', 
+        px: '6vw',
+        pb: { xs: 8, sm: 10, md: 12 } // Ajout de marge en bas pour le scroll
+      }}>
         <Typography 
           variant="h6" 
           sx={{ 
@@ -545,6 +582,7 @@ export default function Home() {
               overflowX: 'auto',
               scrollBehavior: 'smooth',
               pb: '2vw',
+              mb: { xs: 4, sm: 6, md: 8 }, // Marge supplémentaire en bas
               '&::-webkit-scrollbar': {
                 display: 'none',
               },

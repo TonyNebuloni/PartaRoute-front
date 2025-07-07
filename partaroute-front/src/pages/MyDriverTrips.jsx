@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
-import PaginationMUI from '../components/PaginationMUI';
 import EditTripModal from '../components/EditTripModal';
 import TripForm from '../components/TripForm';
 
@@ -34,9 +33,6 @@ export default function MyDriverTrips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [total, setTotal] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
   const [editTrip, setEditTrip] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -45,7 +41,7 @@ export default function MyDriverTrips() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '' });
   const navigate = useNavigate();
 
-  const fetchTrips = async (pageArg = page, limitArg = limit) => {
+  const fetchTrips = async () => {
     setLoading(true);
     setError("");
     const token = localStorage.getItem("accessToken");
@@ -55,13 +51,10 @@ export default function MyDriverTrips() {
       return;
     }
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/trips/conducteur/trajets?page=${pageArg}&limit=${limitArg}`, {
+      const res = await axios.get(`${BACKEND_URL}/api/trips/conducteur/trajets`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTrips(res.data.data || res.data);
-      setTotal(res.data.total || 0);
-      setPage(res.data.page || 1);
-      setLimit(res.data.limit || 10);
     } catch (err) {
       setError("Erreur lors de la récupération des trajets proposés.");
     } finally {
@@ -74,10 +67,10 @@ export default function MyDriverTrips() {
   }, []);
 
   useEffect(() => {
-    const handleCreated = () => fetchTrips(page, limit);
+    const handleCreated = () => fetchTrips();
     window.addEventListener('trajetCreated', handleCreated);
     return () => window.removeEventListener('trajetCreated', handleCreated);
-  }, [page, limit]);
+  }, []);
 
   const handleStatut = async (id, statut) => {
     const token = localStorage.getItem("accessToken");
@@ -101,23 +94,12 @@ export default function MyDriverTrips() {
       setSnackbar({ open: true, message: 'Trajet supprimé avec succès.' });
       setDeleteOpen(false);
       setDeleteId(null);
-      fetchTrips(page, limit);
+      fetchTrips();
     } catch (err) {
       setSnackbar({ open: true, message: 'Erreur lors de la suppression du trajet.' });
       setDeleteOpen(false);
       setDeleteId(null);
     }
-  };
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-    fetchTrips(newPage, limit);
-  };
-  
-  const handleLimitChange = (newLimit) => {
-    setLimit(newLimit);
-    setPage(1);
-    fetchTrips(1, newLimit);
   };
 
   const getStatusInfo = (statut) => {
@@ -625,19 +607,6 @@ export default function MyDriverTrips() {
           </Stack>
         )}
 
-        {/* Pagination */}
-        {trips.length > 0 && (
-          <Box mt="6vw">
-            <PaginationMUI
-              page={page}
-              count={Math.ceil(total / limit) || 1}
-              onChange={handlePageChange}
-              limit={limit}
-              onLimitChange={handleLimitChange}
-            />
-          </Box>
-        )}
-
         {/* Dialog de création de trajet */}
         <Dialog 
           open={createOpen} 
@@ -676,7 +645,7 @@ export default function MyDriverTrips() {
           onClose={() => setEditOpen(false)}
           trip={editTrip}
           onSuccess={() => {
-            fetchTrips(page, limit);
+            fetchTrips();
             setSnackbar({ open: true, message: 'Trajet modifié avec succès !' });
           }}
         />

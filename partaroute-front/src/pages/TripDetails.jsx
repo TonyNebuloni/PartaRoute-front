@@ -184,6 +184,7 @@ export default function TripDetails() {
         borderBottomRightRadius: 0,
         mt: 0,
         p: '6vw',
+        pb: { xs: 8, sm: 10, md: 12 }, // Ajout de marge en bas pour le scroll
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -448,8 +449,8 @@ export default function TripDetails() {
                 onClick={handleReservation}
                 disabled={resLoading || placesRestantes <= 0}
                 sx={{
-                  bgcolor: placesRestantes > 0 ? '#232323' : '#ccc',
-                  color: 'white',
+                  bgcolor: placesRestantes > 0 ? '#D6FFB7' : '#ccc',
+                  color: placesRestantes > 0 ? '#232323' : '#666',
                   borderRadius: '999px',
                   fontWeight: 'bold',
                   py: '3vw',
@@ -457,15 +458,11 @@ export default function TripDetails() {
                   fontFamily: 'Gluten, cursive',
                   textTransform: 'none',
                   '&:hover': {
-                    bgcolor: placesRestantes > 0 ? '#111' : '#ccc',
+                    bgcolor: placesRestantes > 0 ? '#c5e8a6' : '#ccc',
                   },
-                  '&:disabled': {
-                    bgcolor: '#ccc',
-                    color: '#666'
-                  }
                 }}
               >
-                {resLoading ? "Réservation..." : placesRestantes > 0 ? "Réserver ce trajet" : "Trajet complet"}
+                {resLoading ? 'Réservation...' : placesRestantes > 0 ? 'Réserver une place' : 'Trajet complet'}
               </Button>
             )
           )}
