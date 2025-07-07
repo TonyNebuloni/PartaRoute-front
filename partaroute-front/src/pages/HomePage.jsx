@@ -1,13 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { Box, Typography, Paper, Stack, CircularProgress, Dialog, DialogTitle, DialogContent, IconButton, Button, useTheme, useMediaQuery, TextField } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box, Typography, Paper, Stack, CircularProgress, Dialog, DialogTitle, DialogContent, IconButton, Button, useTheme, useMediaQuery, TextField, Card, CardContent, List, ListItem, ListItemText } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import TripCardList from "../components/TripCardList";
 import TripForm from "../components/TripForm";
 import CloseIcon from "@mui/icons-material/Close";
 import PaginationMUI from '../components/PaginationMUI';
+import imgCannes from '../assets/img_cannes.jpg';
+import imgAntibes from '../assets/img_antibes.jpg';
 
 const BACKEND_URL = import.meta.env.VITE_API_URL;
+
+// Ajout de la police Google Fonts via une balise <link>
+if (!document.getElementById('google-font-gluten')) {
+  const preconnect1 = document.createElement('link');
+  preconnect1.rel = 'preconnect';
+  preconnect1.href = 'https://fonts.googleapis.com';
+  document.head.appendChild(preconnect1);
+  
+  const preconnect2 = document.createElement('link');
+  preconnect2.rel = 'preconnect';
+  preconnect2.href = 'https://fonts.gstatic.com';
+  preconnect2.crossOrigin = 'anonymous';
+  document.head.appendChild(preconnect2);
+  
+  const link = document.createElement('link');
+  link.id = 'google-font-gluten';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Gluten:wght@100..900&display=swap';
+  document.head.appendChild(link);
+}
 
 export default function Home() {
   const [prenom, setPrenom] = useState("");
@@ -21,15 +43,24 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [total, setTotal] = useState(0);
+  const [userName, setUserName] = useState('');
+  const [currentCity, setCurrentCity] = useState('Paris');
+  const [cityDialogOpen, setCityDialogOpen] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
+  const [searchTimeout, setSearchTimeout] = useState(null);
+  const scrollRef = useRef(null);
+  const navigate = useNavigate();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  useEffect(() => {
+  // Fonction pour faire la recherche avec debounce
+  const performSearch = (departValue, arriveeValue) => {
     setLoading(true);
     let url = `${BACKEND_URL}/api/trips?page=${page}&limit=${limit}`;
-    if (villeDepart) url += `&ville_depart=${encodeURIComponent(villeDepart)}`;
-    if (villeArrivee) url += `&ville_arrivee=${encodeURIComponent(villeArrivee)}`;
+    if (departValue) url += `&ville_depart=${encodeURIComponent(departValue)}`;
+    if (arriveeValue) url += `&ville_arrivee=${encodeURIComponent(arriveeValue)}`;
+    
     axios
       .get(url)
       .then((res) => {
@@ -43,14 +74,49 @@ export default function Home() {
         } else if (res.data.trips && Array.isArray(res.data.trips)) {
           tripsArr = res.data.trips;
         }
-        setTrips(tripsArr);
+        
+        // Trier les trajets : ceux de la ville sélectionnée en premier
+        const sortedTrips = tripsArr.sort((a, b) => {
+          const aFromSelected = a.ville_depart?.toLowerCase() === currentCity.toLowerCase();
+          const bFromSelected = b.ville_depart?.toLowerCase() === currentCity.toLowerCase();
+          
+          if (aFromSelected && !bFromSelected) return -1;
+          if (!aFromSelected && bFromSelected) return 1;
+          return 0;
+        });
+        
+        setTrips(sortedTrips);
         setTotal(totalCount);
         setLoading(false);
+        
+        // Extraire les villes disponibles depuis les vraies données
+        const cities = [...new Set(tripsArr.map(trip => trip.ville_depart))];
+        setAvailableCities(cities);
       })
       .catch((err) => {
         setError("Erreur lors de la récupération des trajets.");
         setLoading(false);
       });
+  };
+
+  // Fonction pour gérer le debounce
+  const handleSearchWithDebounce = (departValue, arriveeValue) => {
+    // Annuler le timeout précédent s'il existe
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Créer un nouveau timeout
+    const newTimeout = setTimeout(() => {
+      performSearch(departValue, arriveeValue);
+    }, 500); // Attendre 500ms après que l'utilisateur arrête de taper
+
+    setSearchTimeout(newTimeout);
+  };
+
+  useEffect(() => {
+    // Chargement initial et changements de page/limite
+    performSearch(villeDepart, villeArrivee);
 
     // Fetch user uniquement si connecté
     const token = localStorage.getItem("accessToken");
@@ -72,11 +138,48 @@ export default function Home() {
     } else {
       setIsConnected(false);
     }
-  }, [page, limit, villeDepart, villeArrivee]);
+
+    // Récupérer le nom de l'utilisateur depuis le localStorage ou l'API
+    const storedUserName = localStorage.getItem('userName');
+    if (storedUserName) {
+      setUserName(storedUserName);
+    } else {
+      // Si pas de nom stocké, on peut faire un appel API pour récupérer les infos utilisateur
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('accessToken');
+      
+      if (userId && token) {
+        // Ici on pourrait faire un appel API pour récupérer le nom
+        // Pour l'instant, on utilise un nom par défaut
+        setUserName('Utilisateur');
+      }
+    }
+
+    // Nettoyer le timeout au démontage du composant
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [page, limit, currentCity]); // Retiré villeDepart et villeArrivee des dépendances
+
+  // Gestionnaires pour les changements de valeurs avec debounce
+  const handleVilleDepartChange = (e) => {
+    const newValue = e.target.value;
+    setVilleDepart(newValue);
+    handleSearchWithDebounce(newValue, villeArrivee);
+  };
+
+  const handleVilleArriveeChange = (e) => {
+    const newValue = e.target.value;
+    setVilleArrivee(newValue);
+    handleSearchWithDebounce(villeDepart, newValue);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Les useEffect se déclenchent automatiquement
+    // Recherche immédiate lors de la soumission du formulaire
+    performSearch(villeDepart, villeArrivee);
   };
 
   const handlePageChange = (newPage) => {
@@ -87,135 +190,638 @@ export default function Home() {
     setPage(1);
   };
 
-  // MOCK DATA pour démo
-  const DEMO_CONDUCTEURS = [
-    {
-      id_utilisateur: 1,
-      nom: "Alice Martin",
-      photo_profil: "https://randomuser.me/api/portraits/women/1.jpg"
-    },
-    {
-      id_utilisateur: 2,
-      nom: "Bob Dupont",
-      photo_profil: "https://randomuser.me/api/portraits/men/2.jpg"
-    },
-    {
-      id_utilisateur: 3,
-      nom: "Chloé Bernard",
-      photo_profil: "https://randomuser.me/api/portraits/women/3.jpg"
-    },
-    {
-      id_utilisateur: 4,
-      nom: "David Leroy",
-      photo_profil: "https://randomuser.me/api/portraits/men/4.jpg"
+  const handleCityChange = () => {
+    setCityDialogOpen(true);
+  };
+
+  const handleCitySelect = (city) => {
+    console.log('City selected:', city, 'Previous city:', currentCity);
+    setCurrentCity(city);
+    setCityDialogOpen(false);
+    // Forcer le rechargement des trajets avec la nouvelle ville
+    setLoading(true);
+    setTimeout(() => setLoading(false), 100); // Petit délai pour voir le changement
+  };
+
+  const handleTripDetails = (tripId) => {
+    navigate(`/trajet/${tripId}`);
+  };
+
+  // Fonction pour le défilement tactile
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    scrollRef.current.startX = touch.clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!scrollRef.current.startX) return;
+    
+    const touch = e.touches[0];
+    const diff = scrollRef.current.startX - touch.clientX;
+    
+    if (Math.abs(diff) > 10) {
+      scrollRef.current.scrollLeft += diff * 0.5;
+      scrollRef.current.startX = touch.clientX;
     }
-  ];
-  const DEMO_VILLES = ["Paris", "Lyon", "Marseille", "Toulouse", "Nantes", "Lille", "Bordeaux", "Nice"];
-  const DEMO_TRAJETS = Array.from({ length: 20 }).map((_, i) => {
-    const conducteur = DEMO_CONDUCTEURS[i % 4];
-    const ville_depart = DEMO_VILLES[i % DEMO_VILLES.length];
-    let ville_arrivee = DEMO_VILLES[(i + 3) % DEMO_VILLES.length];
-    if (ville_arrivee === ville_depart) ville_arrivee = DEMO_VILLES[(i + 4) % DEMO_VILLES.length];
-    return {
-      id_trajet: 1000 + i,
-      conducteur_id: conducteur.id_utilisateur,
-      ville_depart,
-      ville_arrivee,
-      date_heure_depart: new Date(Date.now() + i * 3600 * 1000).toISOString(),
-      places_disponibles: 1 + (i % 5),
-      prix: (10 + (i * 2.5)).toFixed(2),
-      conducteur
-    };
-  });
+  };
+
+  const handleTouchEnd = () => {
+    scrollRef.current.startX = null;
+  };
 
   return (
-    <Box minHeight="100vh" display="flex" alignItems="stretch" justifyContent="flex-start" bgcolor="grey.100" px={1}>
-      <Paper elevation={3} sx={{
-        width: '100%',
-        maxWidth: { xs: '100%', sm: '100%' },
-        borderRadius: 4,
-        p: { xs: 1.5, sm: 3 },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        minHeight: 'calc(100vh - 64px)',
-        boxSizing: 'border-box',
-      }}>
-        {/* Header */}
-        {/* (Supprimé : logo et titre, maintenant dans la navbar globale) */}
-        {/* Modale création trajet */}
-        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
-          <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
-            Nouveau trajet
-            <IconButton onClick={() => setOpen(false)} size="small">
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            <TripForm
-              onTripCreated={trip => {
-                setTrips(prev => [trip, ...prev]);
-                setOpen(false);
-              }}
-            />
-          </DialogContent>
-        </Dialog>
-        {/* Contenu principal */}
-        <Box flex={1} display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" mt={isMobile ? 1 : 4}>
-          <form onSubmit={handleSearch} style={{ width: '100%', maxWidth: 600, marginBottom: 24 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="center">
-              <TextField
-                label="Ville de départ"
-                variant="outlined"
-                size="small"
-                value={villeDepart}
-                onChange={e => setVilleDepart(e.target.value)}
-                fullWidth
-              />
-              <TextField
-                label="Ville d'arrivée"
-                variant="outlined"
-                size="small"
-                value={villeArrivee}
-                onChange={e => setVilleArrivee(e.target.value)}
-                fullWidth
-              />
-              <Button type="submit" variant="contained" color="primary" sx={{ minWidth: 120, height: 40 }}>
-                Rechercher
-              </Button>
-            </Stack>
-          </form>
-          <Typography
-            variant="h5"
-            align="center"
-            gutterBottom
-            sx={{ fontFamily: 'Pacifico, cursive', fontSize: isMobile ? '1.2rem' : '2rem', mb: 2 }}
+    <Box sx={{ minHeight: '100vh', pb: '100px' }}>
+      {/* Section supérieure grise */}
+      <Box 
+        sx={{
+          bgcolor: '#232323',
+          color: 'white',
+          fontFamily: 'Gluten, cursive',
+          position: 'relative',
+          pb: '20vw', // Plus haut pour que la carte soit bien entre gris et blanc
+          borderBottomLeftRadius: '30px',
+          borderBottomRightRadius: '30px',
+        }}
+      >
+        {/* Header avec salutation */}
+        <Box sx={{ p: '6vw', pt: '12vw' }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(1.5rem, 8vw, 2.5rem)',
+              fontWeight: 400,
+              mb: '2vw',
+              color: '#D6FFB7'
+            }}
           >
-            {isConnected ? `Bienvenue, ${prenom} 👋` : 'Bienvenue sur PartaRoute !'}
+            Salut, {prenom || userName || 'Utilisateur'}
           </Typography>
-          <Typography variant="body2" align="center" sx={{ color: 'grey.600', mb: 2 }}>
-            Voici les trajets disponibles aujourd'hui :
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              fontFamily: 'Gluten, cursive',
+              fontSize: 'clamp(1.2rem, 6vw, 2rem)',
+              fontWeight: 400,
+              color: 'white',
+              mb: '8vw'
+            }}
+          >
+            Où voudrait tu aller aujourd'hui ?
           </Typography>
-          {loading ? (
-            <CircularProgress sx={{ my: 4 }} />
-          ) : error ? (
-            <Typography color="error" align="center" sx={{ mb: 2 }}>{error}</Typography>
-          ) : trips.length === 0 ? (
-            <Typography align="center" sx={{ color: 'grey.600', mb: 2 }}>Aucun trajet disponible.</Typography>
-          ) : (
-            <>
-              <TripCardList trips={trips.length === 0 ? DEMO_TRAJETS : trips} showPlacesRestantes={false} showSimple={true} />
-              <PaginationMUI
-                page={page}
-                count={Math.ceil(total / limit) || 1}
-                onChange={handlePageChange}
-                limit={limit}
-                onLimitChange={handleLimitChange}
-              />
-            </>
-          )}
         </Box>
-      </Paper>
+
+        {/* Section de recherche avec image - positionnée absolument pour chevaucher */}
+        <Box sx={{ 
+          px: '6vw', 
+          position: 'absolute', 
+          bottom: '-100px', // Positionne la carte pour qu'elle chevauche
+          left: 0,
+          right: 0,
+          zIndex: 10 
+        }}>
+          <Card 
+            sx={{
+              borderRadius: '20px',
+              overflow: 'hidden',
+              position: 'relative',
+              height: '200px',
+              backgroundImage: `url(${imgCannes})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <Box 
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                p: '5vw',
+              }}
+            >
+              {/* Header de la carte */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                  <Typography 
+                    sx={{ 
+                      fontFamily: 'Gluten, cursive',
+                      fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                      color: 'white',
+                      opacity: 0.9,
+                      mb: '1vw'
+                    }}
+                  >
+                    Co-voiturage le plus proche
+                  </Typography>
+                  <Typography 
+                    sx={{ 
+                      fontFamily: 'Gluten, cursive',
+                      fontSize: 'clamp(1.5rem, 7vw, 2.2rem)',
+                      color: 'white',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentCity}
+                  </Typography>
+                </Box>
+                <Button
+                  onClick={handleCityChange}
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.9)',
+                    color: '#222',
+                    borderRadius: '20px',
+                    px: '4vw',
+                    py: '1vw',
+                    fontSize: 'clamp(0.6rem, 2vw, 0.75rem)',
+                    fontFamily: 'Gluten, cursive',
+                    fontWeight: 500,
+                    textTransform: 'none',
+                    minWidth: '120px',
+                    height: '30px',
+                    whiteSpace: 'nowrap',
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,1)',
+                    }
+                  }}
+                >
+                  Changer de ville
+                </Button>
+              </Box>
+
+              {/* Champs de recherche fonctionnels */}
+              <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: '3vw' }}>
+                <Box 
+                  sx={{
+                    flex: 1,
+                    bgcolor: 'rgba(255,255,255,0.95)',
+                    borderRadius: '15px',
+                    p: '2vw',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.5vw',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => document.getElementById('ville-depart').focus()}
+                >
+                  <Box 
+                    sx={{
+                      width: '5vw',
+                      height: '5vw',
+                      bgcolor: '#232323',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '20px',
+                      minHeight: '20px',
+                      maxWidth: '24px',
+                      maxHeight: '24px',
+                    }}
+                  >
+                    <Typography sx={{ color: 'white', fontSize: 'clamp(0.6rem, 2vw, 0.8rem)', fontWeight: 'bold' }}>A</Typography>
+                  </Box>
+                  <TextField
+                    id="ville-depart"
+                    placeholder="Ville de départ"
+                    value={villeDepart}
+                    onChange={handleVilleDepartChange}
+                    variant="standard"
+                    sx={{
+                      flex: 1,
+                      '& .MuiInput-underline:before': { display: 'none' },
+                      '& .MuiInput-underline:after': { display: 'none' },
+                      '& .MuiInputBase-input': {
+                        fontFamily: 'Gluten, cursive',
+                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                        color: '#222',
+                        fontWeight: 500,
+                        padding: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      },
+                      '& .MuiInputBase-input::placeholder': {
+                        fontFamily: 'Gluten, cursive',
+                        color: '#222',
+                        opacity: 1,
+                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                      }
+                    }}
+                  />
+                </Box>
+                <Box 
+                  sx={{
+                    flex: 1,
+                    bgcolor: 'rgba(255,255,255,0.95)',
+                    borderRadius: '15px',
+                    p: '2vw',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.5vw',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => document.getElementById('ville-arrivee').focus()}
+                >
+                  <Box 
+                    sx={{
+                      width: '5vw',
+                      height: '5vw',
+                      bgcolor: '#232323',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '20px',
+                      minHeight: '20px',
+                      maxWidth: '24px',
+                      maxHeight: '24px',
+                    }}
+                  >
+                    <Typography sx={{ color: 'white', fontSize: 'clamp(0.6rem, 2vw, 0.8rem)', fontWeight: 'bold' }}>B</Typography>
+                  </Box>
+                  <TextField
+                    id="ville-arrivee"
+                    placeholder="Ville d'arrivée"
+                    value={villeArrivee}
+                    onChange={handleVilleArriveeChange}
+                    variant="standard"
+                    sx={{
+                      flex: 1,
+                      '& .MuiInput-underline:before': { display: 'none' },
+                      '& .MuiInput-underline:after': { display: 'none' },
+                      '& .MuiInputBase-input': {
+                        fontFamily: 'Gluten, cursive',
+                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                        color: '#222',
+                        fontWeight: 500,
+                        padding: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      },
+                      '& .MuiInputBase-input::placeholder': {
+                        fontFamily: 'Gluten, cursive',
+                        color: '#222',
+                        opacity: 1,
+                        fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Card>
+        </Box>
+      </Box>
+
+      {/* Section inférieure blanche */}
+      <Box sx={{ bgcolor: 'white', pt: '120px', px: '6vw' }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            fontFamily: 'Gluten, cursive',
+            fontSize: 'clamp(1.1rem, 5vw, 1.5rem)',
+            fontWeight: 600,
+            color: '#222',
+            mb: '4vw'
+          }}
+        >
+          Trajets disponible aujourd'hui :
+        </Typography>
+
+        {/* État de chargement */}
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress sx={{ color: '#D6FFB7' }} />
+          </Box>
+        )}
+
+        {/* État d'erreur */}
+        {error && (
+          <Typography 
+            sx={{ 
+              fontFamily: 'Gluten, cursive',
+              color: '#D6FFB7',
+              textAlign: 'center',
+              mb: 4
+            }}
+          >
+            {error}
+          </Typography>
+        )}
+
+        {/* Aucun trajet */}
+        {!loading && !error && (trips.length === 0) && (
+          <Typography 
+            sx={{ 
+              fontFamily: 'Gluten, cursive',
+              color: '#222',
+              textAlign: 'center',
+              opacity: 0.7,
+              mb: 4
+            }}
+          >
+            Aucun trajet disponible.
+          </Typography>
+        )}
+
+        {/* Container des cartes avec défilement */}
+        {!loading && !error && (
+          <Box 
+            key={currentCity}
+            ref={scrollRef}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            sx={{
+              display: 'flex',
+              gap: '4vw',
+              overflowX: 'auto',
+              scrollBehavior: 'smooth',
+              pb: '2vw',
+              '&::-webkit-scrollbar': {
+                display: 'none',
+              },
+              scrollbarWidth: 'none',
+            }}
+          >
+            {(() => {
+              // Utiliser les vraies données de l'API maintenant qu'elles contiennent des villes françaises
+              const tripsToShow = trips.length > 0 ? trips : [];
+              
+              console.log('Using real API data with French cities');
+              console.log('API trips:', tripsToShow.map(t => `${t.ville_depart} -> ${t.ville_arrivee}`));
+              console.log('Current selected city:', currentCity);
+              
+              // Liste des villes françaises pour le tri
+              const frenchCities = [
+                'Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 
+                'Montpellier', 'Strasbourg', 'Bordeaux', 'Lille', 'Rennes', 
+                'Reims', 'Saint-Étienne', 'Toulon', 'Le Havre', 'Grenoble',
+                'Dijon', 'Angers', 'Nîmes', 'Villeurbanne', 'Clermont-Ferrand',
+                'Aix-en-Provence', 'Brest', 'Tours', 'Amiens', 'Limoges',
+                'Annecy', 'Perpignan', 'Boulogne-Billancourt', 'Orléans',
+                'Mulhouse', 'Rouen', 'Caen', 'Nancy', 'Argenteuil',
+                'Cannes', 'Antibes', 'Monaco', 'Grasse'
+              ];
+              
+              // Trier avec priorité : ville sélectionnée > Paris > autres villes françaises > autres villes
+              const sortedTrips = tripsToShow.sort((a, b) => {
+                const aFromSelected = a.ville_depart?.toLowerCase() === currentCity.toLowerCase();
+                const bFromSelected = b.ville_depart?.toLowerCase() === currentCity.toLowerCase();
+                const aFromParis = a.ville_depart?.toLowerCase() === 'paris';
+                const bFromParis = b.ville_depart?.toLowerCase() === 'paris';
+                const aFromFrench = frenchCities.some(city => city.toLowerCase() === a.ville_depart?.toLowerCase());
+                const bFromFrench = frenchCities.some(city => city.toLowerCase() === b.ville_depart?.toLowerCase());
+                
+                // 1. Ville sélectionnée en PREMIER (priorité absolue)
+                if (aFromSelected && !bFromSelected) return -1;
+                if (!aFromSelected && bFromSelected) return 1;
+                
+                // 2. Si aucun des deux n'est de la ville sélectionnée, alors Paris en second
+                if (!aFromSelected && !bFromSelected) {
+                  if (aFromParis && !bFromParis) return -1;
+                  if (!aFromParis && bFromParis) return 1;
+                }
+                
+                // 3. Puis autres villes françaises
+                if (!aFromSelected && !bFromSelected && !aFromParis && !bFromParis) {
+                  if (aFromFrench && !bFromFrench) return -1;
+                  if (!aFromFrench && bFromFrench) return 1;
+                }
+                
+                return 0;
+              });
+              
+              console.log('Trips before sorting:', tripsToShow.map(t => `${t.ville_depart} -> ${t.ville_arrivee}`));
+              console.log('Trips after sorting:', sortedTrips.map(t => `${t.ville_depart} -> ${t.ville_arrivee}`));
+              console.log('Current city:', currentCity);
+              
+              return sortedTrips.map((trip) => (
+                <Card 
+                  key={trip.id_trajet}
+                  sx={{
+                    minWidth: '280px',
+                    width: '70vw',
+                    maxWidth: '320px',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    height: '350px',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    '&:hover': {
+                      transform: 'scale(1.02)',
+                    }
+                  }}
+                  onClick={() => handleTripDetails(trip.id_trajet)}
+                >
+                  <Box 
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundImage: `url(${trip.ville_depart && trip.ville_depart.toLowerCase().includes('cannes') ? imgCannes : imgAntibes})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
+                  />
+                  <Box 
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)',
+                    }}
+                  />
+                  
+                  {/* Badge "COMPLET" si places_disponibles === 0 */}
+                  {trip.places_disponibles === 0 && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        bgcolor: '#ff4444',
+                        color: 'white',
+                        px: '8px',
+                        py: '4px',
+                        borderRadius: '12px',
+                        fontSize: 'clamp(0.6rem, 2.5vw, 0.8rem)',
+                        fontFamily: 'Gluten, cursive',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        zIndex: 10,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                      }}
+                    >
+                      COMPLET
+                    </Box>
+                  )}
+                  
+                  <CardContent 
+                    sx={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      color: 'white',
+                      p: '5vw',
+                    }}
+                  >
+                    <Typography 
+                      sx={{ 
+                        fontFamily: 'Gluten, cursive',
+                        fontSize: 'clamp(1.2rem, 6vw, 1.8rem)',
+                        fontWeight: 600,
+                        mb: '2vw'
+                      }}
+                    >
+                      {trip.ville_depart} → {trip.ville_arrivee}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '1vw' }}>
+                        <Typography 
+                          sx={{ 
+                            fontFamily: 'Gluten, cursive',
+                            fontSize: 'clamp(1rem, 5vw, 1.4rem)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {trip.prix}
+                        </Typography>
+                        <Typography 
+                          sx={{ 
+                            fontFamily: 'Gluten, cursive',
+                            fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+                            opacity: 0.8,
+                          }}
+                        >
+                          €
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <Typography 
+                          sx={{ 
+                            fontFamily: 'Gluten, cursive',
+                            fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                            opacity: 0.9,
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          plus de détails ?
+                        </Typography>
+                        {trip.places_disponibles > 0 && (
+                          <Typography 
+                            sx={{ 
+                              fontFamily: 'Gluten, cursive',
+                              fontSize: 'clamp(0.7rem, 3vw, 0.9rem)',
+                              opacity: 0.8,
+                              mt: '0.5vw',
+                            }}
+                          >
+                            {trip.places_disponibles} place{trip.places_disponibles > 1 ? 's' : ''} restante{trip.places_disponibles > 1 ? 's' : ''}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ));
+            })()}
+          </Box>
+        )}
+      </Box>
+
+      {/* Dialog de sélection de ville */}
+      <Dialog 
+        open={cityDialogOpen} 
+        onClose={() => setCityDialogOpen(false)}
+        maxWidth="xs" 
+        fullWidth
+      >
+        <DialogTitle sx={{ 
+          fontFamily: 'Gluten, cursive',
+          textAlign: 'center',
+          bgcolor: '#232323',
+          color: 'white'
+        }}>
+          Choisir une ville
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          <List>
+            {(() => {
+              // Utiliser les villes disponibles depuis l'API + quelques villes françaises populaires
+              const apiCities = availableCities.length > 0 ? availableCities : [];
+              const popularFrenchCities = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Montpellier', 'Strasbourg', 'Cannes', 'Antibes'];
+              
+              // Combiner les villes de l'API avec les villes populaires, en évitant les doublons
+              const allCities = [...new Set([...apiCities, ...popularFrenchCities])].sort();
+              
+              console.log('City selector: Using API cities + popular French cities');
+              console.log('Available cities:', allCities);
+
+              return allCities.map((city) => (
+                <ListItem 
+                  key={city}
+                  button
+                  onClick={() => handleCitySelect(city)}
+                  sx={{
+                    '&:hover': {
+                      bgcolor: '#D6FFB7',
+                    }
+                  }}
+                >
+                  <ListItemText 
+                    primary={city}
+                    sx={{
+                      '& .MuiTypography-root': {
+                        fontFamily: 'Gluten, cursive',
+                        fontSize: '1.1rem',
+                      }
+                    }}
+                  />
+                </ListItem>
+              ));
+            })()}
+          </List>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modale création trajet */}
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          pr: 1,
+          fontFamily: 'Gluten, cursive'
+        }}>
+          Nouveau trajet
+          <IconButton onClick={() => setOpen(false)} size="small">
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <TripForm
+            onTripCreated={trip => {
+              setTrips(prev => [trip, ...prev]);
+              setOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }
