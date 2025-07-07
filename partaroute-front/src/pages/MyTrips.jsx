@@ -3,7 +3,7 @@ import { Box, Typography, Paper, CircularProgress, Alert, Stack, Button, Avatar,
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PaginationMUI from '../components/PaginationMUI';
+import CustomPagination from '../components/CustomPagination';
 import logoIcon from '../assets/logo_icon.png';
 
 // Ajout de la police Google Fonts via une balise <link>
@@ -136,6 +136,11 @@ export default function MyTrips() {
       default:
         return { label: "En attente", color: "#ff9800", bgColor: "#fff3e0" };
     }
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPage(1);
   };
 
   if (loading) return (
@@ -537,6 +542,17 @@ export default function MyTrips() {
                 );
               })}
             </Stack>
+          )}
+
+          {/* Pagination custom sous la liste des réservations */}
+          {reservations.length > 0 && (
+            <CustomPagination
+              page={page}
+              count={Math.max(1, Math.ceil(reservations.length / limit))}
+              onChange={setPage}
+              limit={limit}
+              onLimitChange={handleLimitChange}
+            />
           )}
         </Paper>
       </Box>
