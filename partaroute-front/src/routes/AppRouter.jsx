@@ -25,13 +25,14 @@ export default function AppRouter({ onOpenCreateTrip }) {
         <Route path="/my-trips" element={<MyTrips />} />
         <Route path="/my-driver-trips" element={<MyDriverTrips />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/compte" element={
           <ProtectedRoute>
             <MyProfile />
           </ProtectedRoute>
         } />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="*" element={<NotFound />} />
+        
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
       </Routes>
     </BrowserRouter>
