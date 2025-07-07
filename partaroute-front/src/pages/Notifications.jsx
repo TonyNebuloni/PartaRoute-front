@@ -8,6 +8,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import InfoIcon from '@mui/icons-material/Info';
 import axios from "axios";
+import logoIcon from '../assets/logo_icon.png';
 
 // Ajout de la police Google Fonts via une balise <link>
 if (!document.getElementById('google-font-gluten')) {
@@ -651,7 +652,7 @@ export default function Notifications() {
           px={3}
         >
           <Box mb={4} width="120px">
-            <img src="/src/assets/logo_icon.png" alt="Logo PartaRoute" style={{ width: '100%', height: 'auto', display: 'block' }} />
+            <img src={logoIcon} alt="Logo PartaRoute" style={{ width: '100%', height: 'auto', display: 'block' }} />
           </Box>
           
           <Typography 
