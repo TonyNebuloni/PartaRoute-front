@@ -589,7 +589,7 @@ export default function MyTrips() {
               mb: 2 
             }}
           >
-            Mes Trajets
+            Mes Réservations
           </Typography>
           
           <Typography 
